@@ -1,0 +1,495 @@
+/* =================================================================
+   ESTILOS PREMIUM PARA CARRITO - FERRETERÍA EL CONSTRUCTOR
+   ================================================================ */
+
+:root {
+    --primary-color: #0f172a;
+    --accent-color: #f59e0b;
+    /* Amarillo ferretero */
+    --accent-hover: #d97706;
+    --bg-main: #f8fafc;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.04);
+    --shadow-md: 0 10px 25px -3px rgba(15, 23, 42, 0.08);
+    --radius-default: 0.75rem;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    margin: 0;
+}
+
+/* =================================================================
+   1. CONTENEDOR Y CABECERA
+   ================================================================ */
+.carrito-container {
+    max-width: 1200px;
+    margin: 2.5rem auto 4rem auto;
+    padding: 0 1.5rem;
+}
+
+.carrito-header {
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.carrito-header h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin: 0 0 0.4rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.carrito-header h2 i {
+    color: var(--accent-hover);
+}
+
+.carrito-header p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* =================================================================
+   2. ALERTAS Y ESTADOS VACÍOS / ÉXITO
+   ================================================================ */
+.alerta-exito {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #15803d;
+    padding: 2.5rem;
+    border-radius: var(--radius-default);
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 2rem;
+}
+
+.alerta-exito i {
+    font-size: 3rem;
+    color: #22c55e;
+    margin-bottom: 1rem;
+}
+
+.alerta-exito h3 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem 0;
+}
+
+.alerta-exito p {
+    font-size: 1rem;
+    margin: 0 0 1.5rem 0;
+    color: #166534;
+}
+
+.alerta-error {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+    padding: 1rem 1.25rem;
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.carrito-vacio {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-default);
+    padding: 4rem 2rem;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.carrito-vacio i {
+    font-size: 3.5rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.carrito-vacio p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    margin: 0 0 1.5rem 0;
+}
+
+/* =================================================================
+   3. LAYOUT GRID PRINCIPAL (ITEMS + RESUMEN)
+   ================================================================ */
+.carrito-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 2rem;
+    align-items: start;
+}
+
+.carrito-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Tarjeta individual de producto en el carrito */
+.carrito-item-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-default);
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s ease;
+}
+
+.carrito-item-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: #cbd5e1;
+}
+
+.carrito-item-card img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    background-color: #f1f5f9;
+    flex-shrink: 0;
+}
+
+.item-details {
+    flex-grow: 1;
+}
+
+.item-details h4 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0 0 0.3rem 0;
+}
+
+.item-precio {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.item-controls {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-shrink: 0;
+}
+
+.input-cantidad {
+    width: 60px;
+    padding: 0.4rem;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    border-radius: 0.4rem;
+    background-color: #f8fafc;
+    font-size: 0.95rem;
+    font-weight: 600;
+    outline: none;
+}
+
+.input-cantidad:focus {
+    border-color: var(--accent-hover);
+    background-color: #ffffff;
+}
+
+.item-subtotal {
+    font-size: 0.95rem;
+    color: var(--text-main);
+    margin: 0;
+    min-width: 110px;
+    text-align: right;
+}
+
+.btn-eliminar-item {
+    background: transparent;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0.4rem;
+    border-radius: 0.4rem;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-eliminar-item:hover {
+    background-color: #fef2f2;
+    color: #dc2626;
+}
+
+/* =================================================================
+   4. RESUMEN DE COMPRA Y CHECKOUT INTEGRADO
+   ================================================================ */
+.carrito-resumen-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-default);
+    padding: 1.75rem;
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: 2rem;
+}
+
+.carrito-resumen-card h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin: 0 0 1.25rem 0;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+}
+
+.resumen-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+}
+
+.carrito-resumen-card hr {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 1.25rem 0;
+}
+
+.resumen-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+}
+
+/* Formulario de Checkout dentro del Resumen */
+.form-checkout-integrado {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.campo-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.campo-grupo label {
+    font-size: 0.825rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.campo-grupo input,
+.campo-grupo textarea {
+    width: 100%;
+    padding: 0.65rem 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    background-color: #f8fafc;
+    color: var(--text-main);
+    font-size: 0.9rem;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.campo-grupo input:focus,
+.campo-grupo textarea:focus {
+    border-color: var(--accent-hover);
+    background-color: #ffffff;
+}
+
+.campo-grupo textarea {
+    resize: vertical;
+    min-height: 70px;
+}
+
+/* Botones Principales */
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
+    color: var(--primary-color);
+    text-decoration: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: inline-block;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    transition: filter 0.2s, transform 0.1s;
+}
+
+.btn-primary:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+    margin-top: 0.5rem;
+    box-sizing: border-box;
+}
+
+/* =================================================================
+   5. RESPONSIVIDAD (MÓVILES)
+   ================================================================ */
+@media (max-width: 900px) {
+    .carrito-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .carrito-resumen-card {
+        position: static;
+    }
+}
+
+@media (max-width: 600px) {
+    .carrito-item-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .item-controls {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 0.75rem;
+        border-top: 1px solid var(--border-color);
+        padding-top: 0.75rem;
+    }
+
+    .item-subtotal {
+        text-align: left;
+        min-width: auto;
+    }
+}
+
+/* --- Estilos para el Modal Personalizado de Eliminación --- */
+.modal-eliminar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(3px);
+    animation: fadeInModal 0.25s ease-in-out;
+}
+
+.modal-eliminar-contenido {
+    background: #ffffff;
+    width: 90%;
+    max-width: 400px;
+    padding: 30px 25px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    animation: scaleUpModal 0.25s ease-in-out;
+}
+
+.modal-eliminar-icono {
+    font-size: 45px;
+    color: #e67e22;
+    /* Tono de advertencia elegante */
+    margin-bottom: 15px;
+}
+
+.modal-eliminar-contenido h3 {
+    font-size: 20px;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.modal-eliminar-contenido p {
+    font-size: 14px;
+    color: #555555;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.modal-eliminar-acciones {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.btn-cancelar-modal,
+.btn-confirmar-modal {
+    flex: 1;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.btn-cancelar-modal {
+    background-color: #e0e0e0;
+    color: #333333;
+}
+
+.btn-cancelar-modal:hover {
+    background-color: #d0d0d0;
+}
+
+.btn-confirmar-modal {
+    background-color: #e74c3c;
+    /* Rojo estilizado para eliminar */
+    color: #ffffff;
+}
+
+.btn-confirmar-modal:hover {
+    background-color: #c0392b;
+}
+
+/* Animaciones suaves para el modal */
+@keyframes fadeInModal {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleUpModal {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

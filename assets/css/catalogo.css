@@ -1,0 +1,753 @@
+/* =================================================================
+   ESTILOS COMPACTOS Y PROFESIONALES - FERRETERÍA EL CONSTRUCTOR
+   ================================================================ */
+
+:root {
+    --primary-color: #0f172a;
+    --primary-light: #1e293b;
+    --accent-color: #f59e0b;
+    --accent-hover: #d97706;
+    --bg-main: #f8fafc;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --success-color: #10b981;
+    --danger-color: #ef4444;
+    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.04);
+    --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+    --radius-default: 0.5rem;
+    --radius-sm: 0.35rem;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+}
+
+.catalogo-main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem 3rem 1.5rem;
+}
+
+/* =================================================================
+   1. LAYOUT PRINCIPAL Y SIDEBAR COMPACTO
+   ================================================================ */
+.catalogo-layout-principal {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 1.25rem;
+    align-items: start;
+}
+
+.sidebar-filtros {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-default);
+    padding: 1rem;
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: 4.5rem;
+}
+
+.sidebar-filtros h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0 0 0.85rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+.filtro-grupo {
+    margin-bottom: 0.85rem;
+}
+
+.filtro-grupo label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 0.3rem;
+}
+
+.filtro-grupo select {
+    width: 100%;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background-color: #f8fafc;
+    color: var(--text-main);
+    font-size: 0.85rem;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 0.85rem;
+}
+
+.filtro-grupo select:focus {
+    border-color: var(--accent-color);
+    background-color: #ffffff;
+}
+
+.checkbox-grupo label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.checkbox-grupo input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--accent-color);
+    cursor: pointer;
+}
+
+.filtro-grupo input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent-color);
+    cursor: pointer;
+}
+
+.btn-aplicar-filtros {
+    width: 100%;
+    background: var(--primary-color);
+    color: #ffffff;
+    border: none;
+    padding: 0.55rem;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 0.25rem;
+}
+
+.btn-aplicar-filtros:hover {
+    background: var(--primary-light);
+}
+
+.btn-limpiar-filtros {
+    display: block;
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.btn-limpiar-filtros:hover {
+    color: var(--danger-color);
+    text-decoration: underline;
+}
+
+/* =================================================================
+   2. GRILLA Y TARJETAS SÚPER COMPACTAS
+   ================================================================ */
+.catalogo-grid-container {
+    width: 100%;
+}
+
+.grid-productos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.card-producto {
+    background-color: var(--card-bg);
+    border-radius: var(--radius-default);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+.card-producto:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: #cbd5e1;
+}
+
+.card-header-acciones {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 10;
+}
+
+.btn-wishlist-toggle {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--border-color);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #94a3b8;
+    font-size: 0.75rem;
+    transition: all 0.2s;
+}
+
+.btn-wishlist-toggle:hover {
+    color: var(--danger-color);
+}
+
+.btn-wishlist-toggle.activo {
+    background: var(--danger-color);
+    color: #ffffff;
+    border-color: var(--danger-color);
+}
+
+.card-imagen {
+    width: 100%;
+    height: 120px;
+    /* Reducida para compactar la tarjeta */
+    background-color: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.card-imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.card-producto:hover .card-imagen img {
+    transform: scale(1.03);
+}
+
+.card-cuerpo {
+    padding: 0.75rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.producto-stock {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+    display: inline-block;
+}
+
+.producto-stock.en-stock {
+    color: var(--success-color);
+}
+
+.producto-stock.agotado {
+    color: var(--danger-color);
+}
+
+.card-cuerpo h3 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0 0 0.25rem 0;
+    line-height: 1.25;
+    display: -webkit-box;
+    display: box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    box-orient: vertical;
+    overflow: hidden;
+}
+
+.precio {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin: 0 0 0.25rem 0;
+}
+
+.descripcion-corta {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.2;
+    display: -webkit-box;
+    display: box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-footer-acciones {
+    padding: 0.5rem 0.75rem 0.75rem 0.75rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+}
+
+.btn-primario {
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
+    color: var(--primary-color);
+    border: none;
+    padding: 0.45rem 0.3rem;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    text-decoration: none;
+    transition: filter 0.2s;
+}
+
+.btn-primario:hover:not(:disabled) {
+    filter: brightness(1.05);
+}
+
+.btn-primario:disabled {
+    background: #cbd5e1;
+    color: #64748b;
+    cursor: not-allowed;
+}
+
+.btn-secundario {
+    background-color: #f1f5f9;
+    color: var(--primary-color);
+    border: 1px solid var(--border-color);
+    padding: 0.45rem 0.3rem;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.btn-secundario:hover {
+    background-color: #e2e8f0;
+}
+
+/* =================================================================
+   3. ESTADO VACÍO Y MODAL COMPACTOS
+   ================================================================ */
+.estado-vacio {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    background: var(--card-bg);
+    border-radius: var(--radius-default);
+    border: 1px dashed #cbd5e1;
+    max-width: 400px;
+    margin: 2rem auto;
+}
+
+.estado-vacio i {
+    font-size: 2.5rem;
+    color: var(--accent-color);
+    margin-bottom: 0.75rem;
+}
+
+.estado-vacio h3 {
+    font-size: 1.1rem;
+    margin: 0 0 0.4rem 0;
+}
+
+.estado-vacio p {
+    font-size: 0.85rem;
+    margin: 0 0 1rem 0;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(3px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.modal-contenido {
+    background-color: var(--card-bg);
+    width: 100%;
+    max-width: 750px;
+    border-radius: var(--radius-default);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-cerrar {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #f1f5f9;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.modal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.modal-imagen-container {
+    background-color: #f8fafc;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid var(--border-color);
+}
+
+.modal-imagen-container img {
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+}
+
+.zoom-hint {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.modal-info {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.modal-info h2 {
+    font-size: 1.15rem;
+    margin: 0 0 0.3rem 0;
+}
+
+.modal-precio {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--accent-hover);
+    margin: 0 0 0.5rem 0;
+}
+
+.modal-descripcion {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0 0 0.75rem 0;
+}
+
+.modal-stock-info {
+    font-size: 0.8rem;
+    margin-bottom: 0.75rem;
+}
+
+.modal-cantidad-grupo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.modal-cantidad-grupo label {
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.modal-cantidad-grupo input {
+    width: 60px;
+    padding: 0.35rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    text-align: center;
+}
+
+.modal-acciones {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.toast-container {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.toast-notificacion {
+    background: var(--primary-color);
+    color: #ffffff;
+    padding: 0.6rem 1rem;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+@media (max-width: 992px) {
+    .catalogo-layout-principal {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar-filtros {
+        position: static;
+        margin-bottom: 1rem;
+    }
+}
+
+/* ==========================================
+   ANIMACIONES Y BOTONES DEL CARRITO
+   ================================---------- */
+
+@keyframes pulseButton {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Botón estilizado "Ir al pago" */
+.btn-ir-pago {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: #27ae60;
+    /* Verde profesional de éxito */
+    color: #ffffff;
+    border: none;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(39, 174, 96, 0.25);
+    transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.btn-ir-pago:hover {
+    background-color: #219653;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(39, 174, 96, 0.35);
+}
+
+.btn-ir-pago:active {
+    transform: scale(0.97);
+}
+
+/* Efecto de vuelo del producto al carrito */
+.flyer-carrito {
+    position: fixed;
+    z-index: 99999;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+    transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Carrito flotante lateral derecho (al hacer scroll) */
+#carrito-flotante-derecha {
+    position: fixed;
+    right: 20px;
+    bottom: 30px;
+    background-color: #ff8c00;
+    /* Naranja corporativo */
+    color: white;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    display: none;
+    /* Se activa dinámicamente con JS */
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    z-index: 9998;
+    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#carrito-flotante-derecha a {
+    color: white;
+    font-size: 20px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    /* Clave para posicionar la insignia absolute */
+}
+
+#carrito-flotante-derecha:hover {
+    transform: scale(1.08);
+    background-color: #e07b00;
+    box-shadow: 0 8px 20px rgba(255, 140, 0, 0.4);
+}
+
+/* Animación de pulso para el botón flotante */
+.pulse-flotante {
+    animation: pulseAnim 0.6s ease;
+}
+
+@keyframes pulseAnim {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Insignia / Badge del número de productos (Ajustada para 1 o varios dígitos) */
+.badge-flotante {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background-color: #e74c3c;
+    /* Rojo de alerta */
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 10px;
+    /* Forma de píldora adaptable */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    border: 2px solid #ffffff;
+    /* Pequeño borde para que destaque sobre el icono */
+}
+
+
+/* Estilo para resaltar un producto específico al venir desde la wishlist */
+.producto-card.highlight,
+.card-producto.highlight,
+[id^="producto-"].highlight {
+    animation: resaltarDestello 2s ease-in-out;
+    border: 2px solid #ffc107 !important;
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.6);
+}
+
+@keyframes resaltarDestello {
+    0% {
+        background-color: #fff3cd;
+        transform: scale(1.02);
+    }
+
+    50% {
+        background-color: #ffeeba;
+        transform: scale(1.02);
+    }
+
+    100% {
+        background-color: transparent;
+        transform: scale(1);
+    }
+}
+
+/* Estilo visual para resaltar el producto seleccionado desde la wishlist */
+.card-producto.highlight-product {
+    border: 3px solid #ff9800 !important;
+    box-shadow: 0 0 20px rgba(255, 152, 0, 0.7) !important;
+    background-color: #fff8e1 !important;
+    transform: scale(1.02);
+    transition: all 0.4s ease-in-out;
+}
+
+/* Estilos adicionales para la barra de búsqueda activa */
+.busqueda-activa-banner {
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #3730a3;
+}
+
+.btn-limpiar-busqueda {
+    background: #dc2626;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.75rem;
+    transition: background 0.2s;
+}
+
+.btn-limpiar-busqueda:hover {
+    background: #b91c1c;
+}

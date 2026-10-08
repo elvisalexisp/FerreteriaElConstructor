@@ -1,0 +1,345 @@
+/* =================================================================
+   ESTILOS PREMIUM PARA LA LISTA DE DESEOS - FERRETERÍA EL CONSTRUCTOR
+   ================================================================ */
+
+:root {
+    --primary-color: #0f172a;
+    --accent-color: #f59e0b;
+    /* Amarillo ferretero */
+    --accent-hover: #d97706;
+    --bg-main: #f8fafc;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.04);
+    --shadow-md: 0 10px 25px -3px rgba(15, 23, 42, 0.08);
+    --radius-default: 0.75rem;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    margin: 0;
+}
+
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem 1.5rem;
+}
+
+/* =================================================================
+   1. SECCIÓN DE TÍTULO
+   ================================================================ */
+.seccion-titulo {
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.seccion-titulo h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin: 0 0 0.4rem 0;
+}
+
+.seccion-titulo p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* =================================================================
+   2. GRILLA Y TARJETAS DE WISHLIST
+   ================================================================ */
+.wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+}
+
+.wishlist-card {
+    background-color: var(--card-bg);
+    border-radius: var(--radius-default);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: all 0.25s ease;
+    padding: 1rem;
+}
+
+.wishlist-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: #cbd5e1;
+}
+
+/* Contenedor de la imagen */
+.imagen-producto {
+    width: 100%;
+    height: 180px;
+    background-color: #f1f5f9;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.imagen-producto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.wishlist-card:hover .imagen-producto img {
+    transform: scale(1.05);
+}
+
+/* Textos de la tarjeta */
+.wishlist-card h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0 0 0.4rem 0;
+    line-height: 1.3;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.wishlist-card .precio {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--accent-hover);
+    margin: 0 0 0.5rem 0;
+}
+
+.wishlist-card .descripcion {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0 0 1.25rem 0;
+    line-height: 1.4;
+    flex-grow: 1;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* =================================================================
+   3. BOTONES Y ACCIONES DE LA TARJETA
+   ================================================================ */
+.acciones-card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+    align-items: center;
+    margin-top: auto;
+}
+
+.btn-primario {
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
+    color: var(--primary-color);
+    border: none;
+    padding: 0.6rem 0.75rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: filter 0.2s, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-primario:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+}
+
+.btn-eliminar {
+    background-color: #fef2f2;
+    color: #ef4444;
+    border: 1px solid #fee2e2;
+    padding: 0.6rem 0.85rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-eliminar:hover {
+    background-color: #ef4444;
+    color: #ffffff;
+    border-color: #ef4444;
+}
+
+/* =================================================================
+   4. ESTADO VACÍO DE LA WISHLIST
+   ================================================================ */
+.alerta-vacia {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--card-bg);
+    border-radius: var(--radius-default);
+    border: 2px dashed var(--border-color);
+    max-width: 500px;
+    margin: 3rem auto;
+}
+
+.alerta-vacia p {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    margin: 0 0 1.5rem 0;
+    font-weight: 500;
+}
+
+.alerta-vacia .btn-primario {
+    display: inline-flex;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+}
+
+/* Estilos para el Modal de Confirmación y Toast personalizados */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.activo {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-box {
+    background: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.activo .modal-box {
+    transform: translateY(0);
+}
+
+.modal-box i {
+    font-size: 40px;
+    color: #d9534f;
+    margin-bottom: 15px;
+}
+
+.modal-box h3 {
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 20px;
+}
+
+.modal-box p {
+    color: #666;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.modal-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.modal-btn-cancelar {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.modal-btn-cancelar:hover {
+    background: #d0d0d0;
+}
+
+.modal-btn-confirmar {
+    background: #d9534f;
+    color: #fff;
+}
+
+.modal-btn-confirmar:hover {
+    background: #c9302c;
+}
+
+/* Estilo mejorado y llamativo para el botón "Ver producto" en la Wishlist */
+.acciones-card .btn-ver-producto {
+    display: inline-block;
+    padding: 9px 18px;
+    background-color: #f39c12;
+    /* Naranja llamativo de tu app */
+    color: #ffffff !important;
+    text-decoration: none !important;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.acciones-card .btn-ver-producto:hover {
+    background-color: #d68910;
+    /* Naranja más oscuro en hover */
+    color: #ffffff !important;
+    text-decoration: none !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+/* =================================================================
+   5. RESPONSIVIDAD (MÓVILES)
+   ================================================================ */
+@media (max-width: 600px) {
+    .wishlist-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .main-container {
+        padding: 1rem;
+    }
+}

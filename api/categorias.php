@@ -1,118 +1,53 @@
 <?php
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+/**
+ * API Categorías - Ferretería El Constructor
+ */
+header('Content-Type: application/json; charset=utf-8');
+require_once __DIR__ . '/../models/Categoria.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
-
-require_once '../config/conexion.php';
-$pdo = Conexion::conectar();
+$categoriaModel = new Categoria();
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
-        try {
-            if (isset($_GET['id'])) {
-                $stmt = $pdo->prepare("SELECT * FROM categorias WHERE id_categoria = ?");
-                $stmt->execute([$_GET['id']]);
-                $categoria = $stmt->fetch(PDO::FETCH_ASSOC);
-                if ($categoria) {
-                    echo json_encode($categoria);
-                } else {
-                    http_response_code(404);
-                    echo json_encode(["error" => "Categoría no encontrada"]);
-                }
+        if (isset($_GET['id'])) {
+            $id = intval($_GET['id']);
+            $data = $categoriaModel->obtenerPorId($id);
+            if ($data) {
+                echo json_encode(["status" => "success", "data" => $data]);
             } else {
-                $stmt = $pdo->query("SELECT * FROM categorias");
-                echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+                http_response_code(404);
+                echo json_encode(["status" => "error", "message" => "Categoría no encontrada"]);
             }
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(["error" => $e->getMessage()]);
+        } else {
+            $data = $categoriaModel->obtenerTodas();
+            echo json_encode(["status" => "success", "data" => $data]);
         }
         break;
 
     case 'POST':
-        try {
-            $data = json_decode(file_get_contents("php://input"), true);
+        // Soporte para creación vía JSON/API si se requiere
+        $input = json_decode(file_get_contents('php://input'), true);
+        $nombre = $input['nombre'] ?? '';
+        $descripcion = $input['descripcion'] ?? '';
 
-            if (!isset($data['nombre'])) {
-                http_response_code(400);
-                echo json_encode(["error" => "El nombre de la categoría es obligatorio"]);
-                break;
+        if (!empty($nombre)) {
+            $resultado = $categoriaModel->crear($nombre, $descripcion);
+            if ($resultado) {
+                http_response_code(201);
+                echo json_encode(["status" => "success", "message" => "Categoría creada correctamente"]);
+            } else {
+                http_response_code(500);
+                echo json_encode(["status" => "error", "message" => "Error al guardar en la base de datos"]);
             }
-
-            $stmt = $pdo->prepare("INSERT INTO categorias (nombre, descripcion) VALUES (?, ?)");
-            $stmt->execute([
-                $data['nombre'],
-                $data['descripcion'] ?? null
-            ]);
-
-            http_response_code(201);
-            echo json_encode([
-                "mensaje" => "Categoría registrada correctamente",
-                "id_categoria" => $pdo->lastInsertId()
-            ]);
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(["error" => $e->getMessage()]);
-        }
-        break;
-
-    case 'PUT':
-        try {
-            $data = json_decode(file_get_contents("php://input"), true);
-
-            if (!isset($data['id_categoria']) && !isset($data['id'])) {
-                http_response_code(400);
-                echo json_encode(["error" => "Se requiere el ID de la categoría para actualizar"]);
-                break;
-            }
-
-            $id = $data['id_categoria'] ?? $data['id'];
-
-            $stmt = $pdo->prepare("UPDATE categorias SET nombre = ?, descripcion = ? WHERE id_categoria = ?");
-            $stmt->execute([
-                $data['nombre'],
-                $data['descripcion'] ?? null,
-                $id
-            ]);
-
-            echo json_encode(["mensaje" => "Categoría actualizada correctamente"]);
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(["error" => $e->getMessage()]);
-        }
-        break;
-
-    case 'DELETE':
-        try {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $id = $data['id_categoria'] ?? $data['id'] ?? $_GET['id'] ?? null;
-
-            if (!$id) {
-                http_response_code(400);
-                echo json_encode(["error" => "Se requiere el ID para eliminar la categoría"]);
-                break;
-            }
-
-            $stmt = $pdo->prepare("DELETE FROM categorias WHERE id_categoria = ?");
-            $stmt->execute([$id]);
-
-            echo json_encode(["mensaje" => "Categoría eliminada correctamente"]);
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(["error" => $e->getMessage()]);
+        } else {
+            http_response_code(400);
+            echo json_encode(["status" => "error", "message" => "El nombre es obligatorio"]);
         }
         break;
 
     default:
         http_response_code(405);
-        echo json_encode(["error" => "Método no permitido"]);
+        echo json_encode(["status" => "error", "message" => "Método no permitido"]);
         break;
 }
-?>

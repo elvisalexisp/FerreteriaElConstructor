@@ -1,128 +1,256 @@
 <?php
+require_once __DIR__ . '/../../models/Resena.php';
+require_once __DIR__ . '/../../models/Producto.php';
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if (!isset($_SESSION['usuario'])) {
-    header("Location: ../login.php");
-    exit();
-}
+$resenaModel = new Resena();
+$productoModel = new Producto();
 
-$isLocal = (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1'));
+$id_usuario_actual = $_SESSION['id_usuario'] ?? null;
 
-if ($isLocal) {
-    $base_url = "http://localhost/FerreteriaElConstructor/";
-} else {
-    $base_url = "https://ferreteriaelconstructor.gt.tc/";
-}
-
-require_once __DIR__ . '/../../models/Resena.php';
-
-$mensaje = '';
-$error = '';
-
+// Procesar envío de formulario (Crear o Editar)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $comentario = trim($_POST['comentario'] ?? '');
-    $calificacion = intval($_POST['calificacion'] ?? 5);
-    $id_usuario = $_SESSION['usuario'];
+    if ($id_usuario_actual) {
+        $accion = $_POST['accion'] ?? 'crear';
+        $id_producto = intval($_POST['id_producto'] ?? 0);
+        $calificacion = intval($_POST['calificacion'] ?? 0);
+        $comentario = trim($_POST['comentario'] ?? '');
 
-    if (!empty($comentario)) {
-        if (Resena::crear($id_usuario, $comentario, $calificacion)) {
-            $mensaje = "⭐ ¡Gracias por tu opinión! Tu reseña ha sido publicada con éxito.";
+        if ($accion === 'editar' && isset($_POST['id_resena'])) {
+            $id_resena = intval($_POST['id_resena']);
+            // Opcional: verificar que la reseña pertenezca al usuario antes de actualizar en el modelo si es necesario
+            $resenaModel->editar($id_resena, $calificacion, $comentario);
         } else {
-            $error = "❌ Ocurrió un error al guardar tu reseña. Inténtalo de nuevo.";
+            if ($id_producto > 0 && $calificacion >= 1 && $calificacion <= 5 && !empty($comentario)) {
+                $resenaModel->crear($id_usuario_actual, $id_producto, $calificacion, $comentario);
+            }
         }
+        header('Location: ' . $directorio_raiz . 'index.php?vista=resenas');
+        exit();
     } else {
-        $error = "⚠️ El campo de comentario no puede estar vacío.";
+        header('Location: ' . $directorio_raiz . 'index.php?vista=login');
+        exit();
     }
 }
 
-$resenas = Resena::obtenerTodas();
+// Procesar eliminación mediante solicitud POST o GET controlada
+if (isset($_GET['accion']) && $_GET['accion'] === 'eliminar' && isset($_GET['id']) && $id_usuario_actual) {
+    $id_resena = intval($_GET['id']);
+    $resenaModel->eliminar($id_resena,);
+    header('Location: ' . $directorio_raiz . 'index.php?vista=resenas');
+    exit();
+}
 
-include __DIR__ . '/../layouts/header_cliente.php';
+$resenas = $resenaModel->obtenerTodas();
+$productos = $productoModel->obtenerTodos();
+$usuarioLogueado = isset($_SESSION['id_usuario']);
 ?>
 
-<div class="main-content-container" style="padding: 25px; max-width: 900px; margin: 0 auto;">
-    <h2 style="color: #1e293b; margin-bottom: 20px;">💬 Opiniones y Reseñas de Clientes</h2>
+<!DOCTYPE html>
+<html lang="es">
 
-    <?php if (!empty($mensaje)): ?>
-        <div
-            style="background: #dcfce7; color: #16a34a; padding: 12px; border-radius: 6px; margin-bottom: 20px; text-align: center; font-weight: 500;">
-            <?php echo $mensaje; ?>
-        </div>
-    <?php endif; ?>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reseñas de Productos - Ferretería El Constructor</title>
+    <link rel="stylesheet" href="<?php echo $directorio_raiz; ?>assets/css/resenas.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <?php if (!empty($error)): ?>
-        <div
-            style="background: #fee2e2; color: #dc2626; padding: 12px; border-radius: 6px; margin-bottom: 20px; text-align: center; font-weight: 500;">
-            <?php echo $error; ?>
-        </div>
-    <?php endif; ?>
+</head>
 
-    <div class="card"
-        style="background: #fff; border-radius: 8px; padding: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 30px;">
-        <h3 style="color: #1e293b; margin-bottom: 15px; font-size: 1.1rem;">✍️ Déjanos tu comentario</h3>
-        <form method="POST" action="">
-            <div style="margin-bottom: 15px;">
-                <label
-                    style="display: block; font-size: 0.9rem; color: #64748b; margin-bottom: 5px;">Calificación:</label>
-                <select name="calificacion" class="form-control"
-                    style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff;">
-                    <option value="5">⭐⭐⭐⭐⭐ (5/5 - Excelente)</option>
-                    <option value="4">⭐⭐⭐⭐ (4/5 - Muy bueno)</option>
-                    <option value="3">⭐⭐⭐ (3/5 - Bueno)</option>
-                    <option value="2">⭐⭐ (2/5 - Regular)</option>
-                    <option value="1">⭐ (1/5 - Malo)</option>
-                </select>
-            </div>
+<body>
 
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; font-size: 0.9rem; color: #64748b; margin-bottom: 5px;">Tu Experiencia /
-                    Comentario:</label>
-                <textarea name="comentario" rows="3" required
-                    placeholder="Cuéntanos sobre la atención, calidad de los materiales o envíos..."
-                    style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;"></textarea>
-            </div>
+    <?php include_once __DIR__ . '/../layouts/header_cliente.php'; ?>
 
-            <button type="submit" class="btn"
-                style="padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Publicar
-                Reseña</button>
-        </form>
-    </div>
-
-    <h3 style="color: #1e293b; margin-bottom: 15px;">🗣️ Lo que dicen nuestros clientes</h3>
-
-    <?php if (empty($resenas)): ?>
-        <div class="card"
-            style="padding: 30px; text-align: center; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-            <p style="color: #64748b;">Aún no hay reseñas publicadas. ¡Sé el primero en dejarnos tu opinión!</p>
-        </div>
-    <?php else: ?>
-        <div style="display: flex; flex-direction: column; gap: 15px;">
-            <?php foreach ($resenas as $r): ?>
-                <div class="card"
-                    style="background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <h4 style="color: #0f172a; font-size: 1rem; margin: 0;">
-                            <?php echo htmlspecialchars($r['nombre'] . ' ' . $r['apellido']); ?>
-                        </h4>
-                        <span style="color: #eab308; font-size: 0.9rem;">
-                            <?php
-                            $estrellas = intval($r['calificacion']);
-                            echo str_repeat('⭐', $estrellas);
-                            ?>
-                        </span>
-                    </div>
-                    <p style="color: #475569; font-size: 0.95rem; line-height: 1.5; margin-bottom: 10px;">
-                        <?php echo nl2br(htmlspecialchars($r['comentario'])); ?>
-                    </p>
-                    <span style="font-size: 0.8rem; color: #94a3b8;"><?php echo $r['fecha']; ?></span>
+    <main class="main-container">
+        <!-- Modal de Confirmación Personalizado -->
+        <div id="modal-confirmacion" class="modal-overlay">
+            <div class="modal-box">
+                <i class="fas fa-exclamation-circle"></i>
+                <h3>¿Estás seguro?</h3>
+                <p>¿Deseas eliminar permanentemente esta reseña?</p>
+                <div class="modal-actions">
+                    <button type="button" class="modal-btn modal-btn-cancelar"
+                        onclick="cerrarModalConfirmacion()">Cancelar</button>
+                    <a id="btn-confirmar-eliminar" href="#" class="modal-btn modal-btn-confirmar"
+                        style="text-decoration: none; display: inline-block; line-height: normal;">Sí, eliminar</a>
                 </div>
-            <?php endforeach; ?>
+            </div>
         </div>
-    <?php endif; ?>
-</div>
 
-<?php
-include __DIR__ . '/../layouts/footer.php';
-?>
+        <section class="seccion-titulo">
+            <h1>Reseñas y Opiniones de Clientes</h1>
+            <p>Comparte tu experiencia o revisa las calificaciones de nuestros productos.</p>
+        </section>
+
+        <?php if ($usuarioLogueado): ?>
+            <div class="card-formulario" id="contenedor-formulario">
+                <h2 id="form-titulo">Deja tu Reseña</h2>
+                <form action="<?php echo $directorio_raiz; ?>index.php?vista=resenas" method="POST" class="form-resena"
+                    id="form-resena-principal">
+                    <input type="hidden" name="accion" id="form-accion" value="crear">
+                    <input type="hidden" name="id_resena" id="form-id-resena" value="">
+
+                    <div class="form-group" id="grupo-producto">
+                        <label for="id_producto">Selecciona el Producto:</label>
+                        <select id="id_producto" name="id_producto" required>
+                            <option value="">-- Elige un producto --</option>
+                            <?php foreach ($productos as $prod): ?>
+                                <option value="<?php echo $prod['id_producto']; ?>">
+                                    <?php echo htmlspecialchars($prod['nombre']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="calificacion">Calificación (1 a 5 Estrellas):</label>
+                        <select id="calificacion" name="calificacion" required>
+                            <option value="5">⭐⭐⭐⭐⭐ (5 - Excelente)</option>
+                            <option value="4">⭐⭐⭐⭐ (4 - Muy Bueno)</option>
+                            <option value="3">⭐⭐⭐ (3 - Bueno)</option>
+                            <option value="2">⭐⭐ (2 - Regular)</option>
+                            <option value="1">⭐ (1 - Malo)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="comentario">Tu Comentario:</label>
+                        <textarea id="comentario" name="comentario" rows="4" placeholder="Escribe tu opinión..."
+                            required></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" class="btn-primario" id="btn-submit-resena">Publicar Reseña</button>
+                        <button type="button" id="btn-cancelar-edicion" class="modal-btn modal-btn-cancelar"
+                            style="display: none;" onclick="cancelarEdicion()">Cancelar Edición</button>
+                    </div>
+                </form>
+            </div>
+        <?php else: ?>
+            <div class="alerta-login">
+                <p>¿Deseas dejar una reseña? <a href="<?php echo $directorio_raiz; ?>index.php?vista=login">Inicia sesión
+                        aquí</a>.</p>
+            </div>
+        <?php endif; ?>
+
+        <section class="lista-resenas">
+            <h2>Opiniones Recientes</h2>
+            <?php if (empty($resenas)): ?>
+                <p class="text-center">Aún no hay reseñas registradas.</p>
+            <?php else: ?>
+                <div class="grid-resenas">
+                    <?php foreach ($resenas as $res): ?>
+                        <div class="resena-card">
+                            <div class="resena-header">
+                                <strong>
+                                    <?php echo htmlspecialchars($res['usuario_nombre']); ?>
+                                </strong>
+                                <span class="calificacion">
+                                    <?php echo str_repeat('⭐', intval($res['calificacion'])); ?>
+                                </span>
+                            </div>
+                            <p class="producto-ref">Producto: <em>
+                                    <?php echo htmlspecialchars($res['producto_nombre']); ?>
+                                </em></p>
+                            <p class="comentario" id="comentario-texto-<?php echo $res['id_resena']; ?>">
+                                <?php echo nl2br(htmlspecialchars($res['comentario'])); ?>
+                            </p>
+                            <small class="fecha">
+                                <?php echo $res['fecha']; ?>
+                            </small>
+
+                            <!-- Mostrar botones solo si la reseña pertenece al usuario logueado -->
+                            <?php if ($usuarioLogueado && isset($res['id_usuario']) && intval($res['id_usuario']) === intval($id_usuario_actual)): ?>
+                                <div class="acciones-resena">
+                                    <button type="button" class="btn-accion-mini btn-editar-mini" onclick="prepararEdicion(
+                                            <?php echo $res['id_resena']; ?>, 
+                                            <?php echo $res['id_producto']; ?>, 
+                                            <?php echo $res['calificacion']; ?>, 
+                                            `<?php echo addslashes($res['comentario']); ?>`
+                                        )">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </button>
+                                    <button type="button" class="btn-accion-mini btn-eliminar-mini"
+                                        onclick="abrirModalEliminar('<?php echo $directorio_raiz; ?>index.php?vista=resenas&accion=eliminar&id=<?php echo $res['id_resena']; ?>')">
+                                        <i class="fas fa-trash-alt"></i> Eliminar
+                                    </button>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </section>
+    </main>
+
+    <?php include_once __DIR__ . '/../layouts/footer.php'; ?>
+
+    <script>
+        const DIRECTORIO_RAIZ = "<?php echo $directorio_raiz; ?>";
+
+        function abrirModalEliminar(urlEliminacion) {
+            document.getElementById('btn-confirmar-eliminar').href = urlEliminacion;
+            document.getElementById('modal-confirmacion').classList.add('activo');
+        }
+
+        function cerrarModalConfirmacion() {
+            document.getElementById('modal-confirmacion').classList.remove('activo');
+        }
+
+        function prepararEdicion(idResena, idProducto, calificacion, comentario) {
+            document.getElementById('form-titulo').innerText = "Editar tu Reseña";
+            document.getElementById('form-accion').value = "editar";
+            document.getElementById('form-id-resena').value = idResena;
+
+            const selectProducto = document.getElementById('id_producto');
+            selectProducto.value = idProducto;
+            selectProducto.disabled = true; // El producto no suele cambiarse al editar una reseña ya creada
+
+            // Creamos un campo hidden temporal para enviar el id_producto ya que los select disabled no se envían por POST
+            let inputHiddenProd = document.getElementById('hidden_id_producto');
+            if (!inputHiddenProd) {
+                inputHiddenProd = document.createElement('input');
+                inputHiddenProd.type = 'hidden';
+                inputHiddenProd.name = 'id_producto';
+                inputHiddenProd.id = 'hidden_id_producto';
+                document.getElementById('form-resena-principal').appendChild(inputHiddenProd);
+            }
+            inputHiddenProd.value = idProducto;
+
+            document.getElementById('calificacion').value = calificacion;
+            document.getElementById('comentario').value = comentario;
+
+            document.getElementById('btn-submit-resena').innerText = "Actualizar Reseña";
+            document.getElementById('btn-cancelar-edicion').style.display = "inline-block";
+
+            // Desplazar la vista suavemente hacia el formulario
+            document.getElementById('contenedor-formulario').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelarEdicion() {
+            document.getElementById('form-titulo').innerText = "Deja tu Reseña";
+            document.getElementById('form-accion').value = "crear";
+            document.getElementById('form-id-resena').value = "";
+
+            const selectProducto = document.getElementById('id_producto');
+            selectProducto.disabled = false;
+            selectProducto.value = "";
+
+            const inputHiddenProd = document.getElementById('hidden_id_producto');
+            if (inputHiddenProd) inputHiddenProd.remove();
+
+            document.getElementById('calificacion').value = "5";
+            document.getElementById('comentario').value = "";
+
+            document.getElementById('btn-submit-resena').innerText = "Publicar Reseña";
+            document.getElementById('btn-cancelar-edicion').style.display = "none";
+        }
+    </script>
+
+</body>
+
+</html>

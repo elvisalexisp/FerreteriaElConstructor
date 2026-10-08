@@ -3,57 +3,18 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$isLocal = (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1'));
+// Cálculo dinámico de la URL base del proyecto para evitar errores de rutas relativas
+$protocolo = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+$host = $_SERVER['HTTP_HOST'];
+$directorio_raiz = "/FerreteriaElConstructor1.0/";
 
-if ($isLocal) {
-    $base_url = "http://localhost/FerreteriaElConstructor/";
-} else {
-    $base_url = "https://ferreteriaelconstructor.gt.tc/";
-}
+$vista_actual = isset($_GET['vista']) ? $_GET['vista'] : 'home';
+$es_catalogo_o_home = ($vista_actual === 'catalogo');
 
-$paginaActual = basename($_SERVER['PHP_SELF']);
-
-$isLoggedIn = isset($_SESSION['usuario']) || isset($_SESSION['nombre']) || isset($_SESSION['correo']);
-$nombreUsuario = $_SESSION['nombre'] ?? $_SESSION['usuario'] ?? 'Invitado';
-
-if ($isLoggedIn) {
-    switch ($paginaActual) {
-        case 'catalogo.php':
-        case 'productos.php':
-            $tituloHeader = "🧱 Catálogo de Productos — Encuentra el material ideal para tu obra";
-            break;
-        case 'carrito.php':
-            $tituloHeader = "🛒 Tu Carrito — Revisa tus materiales antes de ordenar";
-            break;
-        case 'pedidos.php':
-            $tituloHeader = "📦 Tus Pedidos — Historial y seguimiento de tus compras";
-            break;
-        case 'perfil.php':
-            $tituloHeader = "👤 Mi Perfil — Actualiza tus datos personales y contraseña";
-            break;
-        case 'resenas.php':
-            $tituloHeader = "⭐ Tus Reseñas — Opiniones de tus productos adquiridos";
-            break;
-        case 'wishlist.php':
-            $tituloHeader = "❤️ Tu Wishlist — Materiales guardados como favoritos";
-            break;
-        case 'index.php':
-            $tituloHeader = "👋 ¡Hola, " . htmlspecialchars($nombreUsuario) . "! Explora nuestros productos";
-            break;
-        default:
-            $tituloHeader = "🛠️ Ferretería El Constructor";
-            break;
-    }
-} else {
-    $tituloHeader = "🛠️ Bienvenido a Ferretería El Constructor";
-    if ($paginaActual === 'login.php') {
-        $tituloHeader = "🔒 Acceso al Sistema — Inicia sesión para continuar";
-    } elseif ($paginaActual === 'registro.php') {
-        $tituloHeader = "📝 Registro de Cliente — Únete a nuestra plataforma";
-    } elseif ($paginaActual === 'catalogo.php') {
-        $tituloHeader = "🧱 Catálogo Abierto — Explora nuestros materiales sin cuenta";
-    }
-}
+// Verificación robusta de sesión (detecta varias formas comunes de guardar el usuario logueado)
+$usuario_logueado = isset($_SESSION['id_usuario']) || isset($_SESSION['id']) || isset($_SESSION['user_id']) || isset($_SESSION['email']);
+$nombre_usuario = $_SESSION['nombre'] ?? $_SESSION['usuario'] ?? $_SESSION['user_name'] ?? 'Cliente';
+$foto_usuario = $_SESSION['foto'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -61,106 +22,144 @@ if ($isLoggedIn) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ferretería El Constructor</title>
-    <link rel="stylesheet" href="<?php echo $base_url; ?>assets/css/estilos.css">
+
+    <!-- SEO para Posicionamiento Web -->
+    <title>
+        <?php echo isset($page_title) ? $page_title : "Ferretería El Constructor | Materiales y Herramientas en Cobán"; ?>
+    </title>
+    <meta name="description"
+        content="<?php echo isset($page_desc) ? $page_desc : "Tu ferretería de confianza en Cobán, Alta Verapaz. Venta de materiales de construcción, herramientas eléctricas, plomería, electricidad y acabados profesionales al mejor precio."; ?>">
+    <meta name="keywords"
+        content="ferreteria en coban, materiales de construccion coban, herramientas, ferreteria el constructor, plomeria, electricidad alta verapaz">
+    <meta name="author" content="Ferretería El Constructor">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Redes Sociales (SEO Social) -->
+    <meta property="og:title" content="Ferretería El Constructor | Todo para tu Construcción en Cobán">
+    <meta property="og:description"
+        content="Encuentra herramientas profesionales, materiales de construcción y asesoría experta en Cobán, Alta Verapaz.">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="es_GT">
+
+    <!-- CSS Principales y Específicos (Rutas Absolutas) -->
+    <link rel="stylesheet" href="<?php echo $directorio_raiz; ?>assets/css/estilos.css">
+    <link rel="stylesheet" href="<?php echo $directorio_raiz; ?>assets/css/headerCliente.css">
+
+    <?php if ($vista_actual === 'catalogo'): ?>
+        <link rel="stylesheet" href="<?php echo $directorio_raiz; ?>assets/css/catalogo.css">
+    <?php elseif ($vista_actual === 'home' || $vista_actual === 'index'): ?>
+        <link rel="stylesheet" href="<?php echo $directorio_raiz; ?>assets/css/indexCliente.css">
+    <?php endif; ?>
+
+    <?php if (isset($extra_css)): ?>
+        <link rel="stylesheet" href="<?php echo $directorio_raiz; ?>assets/css/<?php echo $extra_css; ?>">
+    <?php endif; ?>
+
+    <!-- FontAwesome para Iconos Profesionales -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="<?php echo $directorio_raiz; ?>assets/js/app.js"></script>
 </head>
 
-<body>
-    <aside class="sidebar">
-        <div class="sidebar-brand">
-            🛠️ Ferretería El Constructor
-        </div>
-        <ul class="sidebar-menu">
-            <li>
-                <a href="<?php echo $base_url; ?>views/clientes/index.php"
-                    class="<?php echo ($paginaActual === 'index.php') ? 'active' : ''; ?>">
-                    🏠 Inicio
-                </a>
-            </li>
-            <li>
-                <a href="<?php echo $base_url; ?>views/clientes/catalogo.php"
-                    class="<?php echo ($paginaActual === 'catalogo.php') ? 'active' : ''; ?>">
-                    🧱 Catálogo
-                </a>
-            </li>
-            <?php if ($isLoggedIn): ?>
-                <li>
-                    <a href="<?php echo $base_url; ?>views/clientes/carrito.php"
-                        class="<?php echo ($paginaActual === 'carrito.php') ? 'active' : ''; ?>">
-                        🛒 Carrito
-                    </a>
-                </li>
-                <li>
-                    <a href="<?php echo $base_url; ?>views/clientes/pedidos.php"
-                        class="<?php echo ($paginaActual === 'pedidos.php') ? 'active' : ''; ?>">
-                        📦 Mis Pedidos
-                    </a>
-                </li>
-                <li>
-                    <a href="<?php echo $base_url; ?>views/clientes/wishlist.php"
-                        class="<?php echo ($paginaActual === 'wishlist.php') ? 'active' : ''; ?>">
-                        ❤️ Wishlist
-                    </a>
-                </li>
-                <li>
-                    <a href="<?php echo $base_url; ?>views/clientes/resenas.php"
-                        class="<?php echo ($paginaActual === 'resenas.php') ? 'active' : ''; ?>">
-                        ⭐ Reseñas
-                    </a>
-                </li>
-                <li>
-                    <a href="<?php echo $base_url; ?>views/clientes/perfil.php"
-                        class="<?php echo ($paginaActual === 'perfil.php') ? 'active' : ''; ?>">
-                        👤 Mi Perfil
-                    </a>
-                </li>
-                <li>
-                    <a href="<?php echo $base_url; ?>views/logout.php">
-                        🚪 Cerrar Sesión
-                    </a>
-                </li>
-            <?php else: ?>
-                <li>
-                    <a href="<?php echo $base_url; ?>views/clientes/carrito.php"
-                        class="<?php echo ($paginaActual === 'carrito.php') ? 'active' : ''; ?>">
-                        🛒 Carrito
-                    </a>
-                </li>
-                <li>
-                    <a href="<?php echo $base_url; ?>views/login.php"
-                        class="<?php echo ($paginaActual === 'login.php') ? 'active' : ''; ?>">
-                        🔑 Iniciar Sesión
-                    </a>
-                </li>
-                <li>
-                    <a href="<?php echo $base_url; ?>views/registro.php"
-                        class="<?php echo ($paginaActual === 'registro.php') ? 'active' : ''; ?>">
-                        📝 Registrarse
-                    </a>
-                </li>
-            <?php endif; ?>
-        </ul>
-    </aside>
-
-    <main class="main-content">
-        <header class="top-header">
-            <h2>
-                <?php echo $tituloHeader; ?>
-            </h2>
-            <div class="user-profile-info">
-                <?php if ($isLoggedIn): ?>
-                    <div class="user-info-container">
-                        <span class="user-logged">👤
-                            <?php echo htmlspecialchars($nombreUsuario); ?>
+<body class="cliente-body">
+    <header class="cliente-header">
+        <!-- Barra Superior de Utilidad -->
+        <div class="header-top-bar">
+            <div class="header-container">
+                <span class="welcome-text"><i class="fas fa-tools"></i> Bienvenidos a Ferretería El Constructor - Cobán,
+                    Alta Verapaz</span>
+                <div class="top-bar-links">
+                    <?php if ($usuario_logueado): ?>
+                        <span class="user-greeting">Hola,
+                            <strong>
+                                <?php echo htmlspecialchars($nombre_usuario); ?>
+                            </strong>
                         </span>
-                        <a href="<?php echo $base_url; ?>views/logout.php" class="header-logout-btn"
-                            title="Cerrar Sesión">Salir</a>
-                    </div>
-                <?php else: ?>
-                    <div class="user-info-container">
-                        <span class="user-logged">👤 Invitado</span>
-                        <a href="<?php echo $base_url; ?>views/login.php" class="header-logout-btn">Ingresar</a>
-                    </div>
-                <?php endif; ?>
+
+                        <a href="<?php echo $directorio_raiz; ?>index.php?vista=perfil"
+                            class="top-link <?php echo ($vista_actual == 'perfil') ? 'active' : ''; ?>">
+                            <?php if (!empty($foto_usuario) && file_exists($_SERVER['DOCUMENT_ROOT'] . $directorio_raiz . "uploads/" . $foto_usuario)): ?>
+                                <img src="<?php echo $directorio_raiz; ?>uploads/<?php echo htmlspecialchars($foto_usuario); ?>"
+                                    alt="Miniatura" class="user-avatar-mini">
+                            <?php else: ?>
+                                <i class="fas fa-user-circle"></i>
+                            <?php endif; ?>
+                            Mi Perfil
+                        </a>
+
+                        <a href="<?php echo $directorio_raiz; ?>index.php?vista=logout" class="top-link logout-btn">
+                            <i class="fas fa-sign-out-alt"></i> Salir
+                        </a>
+                    <?php else: ?>
+                        <a href="<?php echo $directorio_raiz; ?>index.php?vista=login"
+                            class="top-link <?php echo ($vista_actual == 'login') ? 'active' : ''; ?>"><i
+                                class="fas fa-sign-in-alt"></i> Iniciar Sesión</a>
+                        <a href="<?php echo $directorio_raiz; ?>index.php?vista=registro"
+                            class="top-link <?php echo ($vista_actual == 'registro') ? 'active' : ''; ?>"><i
+                                class="fas fa-user-plus"></i> Registrarse</a>
+                    <?php endif; ?>
+                </div>
             </div>
-        </header>
+        </div>
+
+        <!-- Navegación Principal y Marca -->
+        <div class="header-main-nav">
+            <div class="header-container">
+                <div class="logo-brand">
+                    <a href="<?php echo $directorio_raiz; ?>index.php">
+                        <h1>El Constructor</h1>
+                        <span>Ferretería & Construcción</span>
+                    </a>
+                </div>
+
+                <nav class="main-navigation">
+                    <ul>
+                        <li><a href="<?php echo $directorio_raiz; ?>index.php"
+                                class="<?php echo ($vista_actual == 'home' || $vista_actual == 'index') ? 'active' : ''; ?>">Inicio</a>
+                        </li>
+                        <li><a href="<?php echo $directorio_raiz; ?>index.php?vista=catalogo"
+                                class="<?php echo ($vista_actual == 'catalogo') ? 'active' : ''; ?>">Catálogo</a></li>
+
+                        <?php if ($usuario_logueado): ?>
+                            <li><a href="<?php echo $directorio_raiz; ?>index.php?vista=pedidos"
+                                    class="<?php echo ($vista_actual == 'pedidos') ? 'active' : ''; ?>"><i
+                                        class="fas fa-box"></i> Mis Pedidos</a></li>
+                            <li><a href="<?php echo $directorio_raiz; ?>index.php?vista=wishlist"
+                                    class="<?php echo ($vista_actual == 'wishlist') ? 'active' : ''; ?>"><i
+                                        class="fas fa-heart"></i> Wishlist</a></li>
+                            <li><a href="<?php echo $directorio_raiz; ?>index.php?vista=resenas"
+                                    class="<?php echo ($vista_actual == 'resenas') ? 'active' : ''; ?>"><i
+                                        class="fas fa-star"></i> Reseñas</a></li>
+                        <?php endif; ?>
+                    </ul>
+                </nav>
+
+                <div class="header-actions">
+                    <a href="<?php echo $directorio_raiz; ?>index.php?vista=carrito"
+                        class="cart-icon-btn <?php echo ($vista_actual == 'carrito') ? 'active' : ''; ?>"
+                        title="Ver Carrito de Compras">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-badge" id="cart-count">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <?php if ($es_catalogo_o_home): ?>
+            <!-- Sección Condicional: Solo la barra de búsqueda -->
+            <div class="header-extended-bar">
+                <div class="header-container">
+                    <div class="header-search-filter-wrapper" style="justify-content: center; width: 100%;">
+                        <!-- Buscador Dinámico de Productos -->
+                        <form action="<?php echo $directorio_raiz; ?>index.php" method="GET" class="header-search-form"
+                            style="width: 100%; max-width: 700px;">
+                            <input type="hidden" name="vista" value="catalogo">
+                            <input type="text" name="busqueda" placeholder="¿Qué herramienta o material buscas hoy?"
+                                class="search-input" autocomplete="off">
+                            <button type="submit" class="search-btn"><i class="fas fa-search"></i> Buscar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+    </header>

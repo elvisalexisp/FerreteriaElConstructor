@@ -1,0 +1,32 @@
+<?php
+/**
+ * Script de Cierre de Sesión Seguro - Ferretería El Constructor
+ */
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Limpiar todas las variables de sesión
+$_SESSION = array();
+
+// Destruir la cookie de sesión si el servidor la utiliza
+if (ini_get("session.use_cookies")) {
+    $params = session_get_cookie_params();
+    setcookie(
+        session_name(),
+        '',
+        time() - 42000,
+        $params["path"],
+        $params["domain"],
+        $params["secure"],
+        $params["httponly"]
+    );
+}
+
+// Destruir completamente la sesión en el servidor
+session_destroy();
+
+// Redireccionar al index con parámetro de éxito para mostrar un mensaje satisfactorio
+header("Location: index.php?logout=success");
+exit();
+?>

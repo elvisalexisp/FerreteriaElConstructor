@@ -1,0 +1,439 @@
+/* =================================================================
+   ESTILOS PREMIUM PARA ADMIN CATEGORÍAS - FERRETERÍA EL CONSTRUCTOR
+   ================================================================ */
+
+:root {
+    --primary-color: #0f172a;
+    --accent-color: #f59e0b;
+    /* Amarillo ferretero */
+    --accent-hover: #d97706;
+    --bg-main: #f8fafc;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.04);
+    --shadow-md: 0 10px 25px -3px rgba(15, 23, 42, 0.08);
+    --radius-default: 0.75rem;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    margin: 0;
+}
+
+/* =================================================================
+   1. CONTENEDOR Y CABECERA DE LA VISTA
+   ================================================================ */
+.admin-main-container {
+    padding: 2.5rem 1.5rem 4rem 1.5rem;
+}
+
+.admin-container {
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+.admin-header-section {
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.admin-header-section h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin: 0 0 0.4rem 0;
+}
+
+.admin-header-section p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* =================================================================
+   2. ALERTAS DEL SISTEMA (ÉXITO / ERROR)
+   ================================================================ */
+.alert-success {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #15803d;
+    padding: 1rem 1.25rem;
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.alert-success i {
+    color: #22c55e;
+    font-size: 1.2rem;
+}
+
+.alert-error {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+    padding: 1rem 1.25rem;
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.alert-error i {
+    color: #ef4444;
+    font-size: 1.2rem;
+}
+
+/* =================================================================
+   3. GRID DE CONTENIDO (FORMULARIO + TABLA)
+   ================================================================ */
+.admin-content-grid {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+/* =================================================================
+   4. TARJETA DE FORMULARIO
+   ================================================================ */
+.admin-form-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-default);
+    padding: 1.75rem;
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: 2rem;
+}
+
+.admin-form-card h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin: 0 0 1.25rem 0;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+}
+
+.form-admin {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.form-group label {
+    font-size: 0.825rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+    width: 100%;
+    padding: 0.65rem 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    background-color: #f8fafc;
+    color: var(--text-main);
+    font-size: 0.9rem;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--accent-hover);
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+/* Botones de acción */
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
+    color: var(--primary-color);
+    text-decoration: none;
+    padding: 0.7rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: inline-block;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    flex-grow: 1;
+    transition: filter 0.2s, transform 0.1s;
+}
+
+.btn-primary:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background-color: #f1f5f9;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 0.7rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-block;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: #e2e8f0;
+    color: var(--text-main);
+}
+
+/* =================================================================
+   5. TARJETA Y TABLA DE DATOS
+   ================================================================ */
+.admin-table-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-default);
+    padding: 1.75rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.admin-table-card h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin: 0 0 1.25rem 0;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.data-table th {
+    background-color: #f1f5f9;
+    color: var(--primary-color);
+    font-weight: 700;
+    padding: 0.85rem 1rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.data-table td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-main);
+    vertical-align: middle;
+}
+
+.data-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.text-center {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 2rem !important;
+}
+
+/* Celda de botones de acción en tabla */
+.actions-cell {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 0.4rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-icon.edit {
+    background-color: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+}
+
+.btn-icon.edit:hover {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+.btn-icon.delete {
+    background-color: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.btn-icon.delete:hover {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+
+/* Estilos personalizados para el Modal de Confirmación Limpio */
+.ferre-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    animation: fadeInModal 0.25s ease forwards;
+}
+
+@keyframes fadeInModal {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.ferre-modal-box {
+    background: #ffffff;
+    width: 100%;
+    max-width: 400px;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    text-align: center;
+    transform: translateY(-10px);
+    animation: slideUpModal 0.25s ease forwards;
+}
+
+@keyframes slideUpModal {
+    to {
+        transform: translateY(0);
+    }
+}
+
+.ferre-modal-icon {
+    font-size: 2.5rem;
+    color: #ef4444;
+    margin-bottom: 15px;
+}
+
+.ferre-modal-box h3 {
+    font-size: 1.15rem;
+    color: #1e293b;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+}
+
+.ferre-modal-box p {
+    font-size: 0.88rem;
+    color: #64748b;
+    margin: 0 0 20px 0;
+    line-height: 1.4;
+}
+
+.ferre-modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.ferre-btn-modal-cancel {
+    background: #e2e8f0;
+    color: #334155;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.ferre-btn-modal-cancel:hover {
+    background: #cbd5e1;
+}
+
+.ferre-btn-modal-confirm {
+    background: #ef4444;
+    color: #ffffff;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.ferre-btn-modal-confirm:hover {
+    background: #dc2626;
+}
+
+/* =================================================================
+   6. RESPONSIVIDAD (MÓVILES Y TABLETS)
+   ================================================================ */
+@media (max-width: 992px) {
+    .admin-content-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-form-card {
+        position: static;
+    }
+}

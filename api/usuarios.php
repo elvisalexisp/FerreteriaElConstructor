@@ -1,143 +1,55 @@
 <?php
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+header('Content-Type: application/json');
+require_once __DIR__ . '/../config/conexion.php';
+require_once __DIR__ . '/../models/Usuario.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
-
-require_once '../config/conexion.php';
-$pdo = Conexion::conectar();
-
+$usuarioModel = new Usuario();
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
-        try {
-            if (isset($_GET['id'])) {
-                $stmt = $pdo->prepare("SELECT id_usuario, nombre, apellido, correo, telefono, direccion, tipo_usuario FROM usuarios WHERE id_usuario = ?");
-                $stmt->execute([$_GET['id']]);
-                $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-                if ($usuario) {
-                    echo json_encode($usuario);
-                } else {
-                    http_response_code(404);
-                    echo json_encode(["error" => "Usuario no encontrado"]);
-                }
-            } else {
-                $stmt = $pdo->query("SELECT id_usuario, nombre, apellido, correo, telefono, direccion, tipo_usuario FROM usuarios");
-                echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
-            }
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(["error" => $e->getMessage()]);
+        if (isset($_GET['id'])) {
+            $id = intval($_GET['id']);
+            echo json_encode($usuarioModel->obtenerPorId($id));
+        } else {
+            echo json_encode($usuarioModel->obtenerTodos());
         }
         break;
 
     case 'POST':
-        try {
-            $data = json_decode(file_get_contents("php://input"), true);
+        $id_usuario = $_POST['id_usuario'] ?? '';
+        $nombre = trim($_POST['nombre'] ?? '');
+        $apellido = trim($_POST['apellido'] ?? '');
+        $correo = trim($_POST['correo'] ?? '');
+        $password = $_POST['password'] ?? '';
+        $telefono = trim($_POST['telefono'] ?? '');
+        $direccion = trim($_POST['direccion'] ?? '');
+        $tipo_usuario = trim($_POST['tipo_usuario'] ?? 'cliente');
 
-            if (!isset($data['nombre']) || !isset($data['correo']) || !isset($data['password'])) {
-                http_response_code(400);
-                echo json_encode(["error" => "Faltan datos obligatorios (nombre, correo, password)"]);
-                break;
+        if (!empty($id_usuario)) {
+            // Actualizar usuario existente
+            $resultado = $usuarioModel->actualizar($id_usuario, $nombre, $apellido, $correo, $telefono, $direccion, $tipo_usuario);
+
+            // Si se proporciona una contraseña nueva, la actualizamos también
+            if (!empty($password)) {
+                $usuarioModel->actualizarPassword($id_usuario, $password);
             }
 
-            $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
-
-            $stmt = $pdo->prepare("INSERT INTO usuarios (nombre, apellido, correo, password, telefono, direccion, tipo_usuario) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([
-                $data['nombre'],
-                $data['apellido'] ?? '',
-                $data['correo'],
-                $passwordHash,
-                $data['telefono'] ?? '',
-                $data['direccion'] ?? '',
-                $data['tipo_usuario'] ?? 'cliente'
-            ]);
-
-            http_response_code(201);
-            echo json_encode([
-                "mensaje" => "Usuario registrado correctamente",
-                "id" => $pdo->lastInsertId()
-            ]);
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(["error" => $e->getMessage()]);
-        }
-        break;
-
-    case 'PUT':
-        try {
-            $data = json_decode(file_get_contents("php://input"), true);
-
-            if (!isset($data['id_usuario'])) {
-                http_response_code(400);
-                echo json_encode(["error" => "Se requiere el ID del usuario para actualizar"]);
-                break;
-            }
-
-            if (!empty($data['password'])) {
-                $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare("UPDATE usuarios SET nombre = ?, apellido = ?, correo = ?, password = ?, telefono = ?, direccion = ?, tipo_usuario = ? WHERE id_usuario = ?");
-                $stmt->execute([
-                    $data['nombre'],
-                    $data['apellido'] ?? '',
-                    $data['correo'],
-                    $passwordHash,
-                    $data['telefono'] ?? '',
-                    $data['direccion'] ?? '',
-                    $data['tipo_usuario'] ?? 'cliente',
-                    $data['id_usuario']
-                ]);
+            echo json_encode(['success' => $resultado]);
+        } else {
+            // Crear nuevo usuario
+            if (!empty($nombre) && !empty($correo) && !empty($password)) {
+                $resultado = $usuarioModel->crear($nombre, $apellido, $correo, $password, $telefono, $direccion, $tipo_usuario);
+                echo json_encode(['success' => $resultado]);
             } else {
-                $stmt = $pdo->prepare("UPDATE usuarios SET nombre = ?, apellido = ?, correo = ?, telefono = ?, direccion = ?, tipo_usuario = ? WHERE id_usuario = ?");
-                $stmt->execute([
-                    $data['nombre'],
-                    $data['apellido'] ?? '',
-                    $data['correo'],
-                    $data['telefono'] ?? '',
-                    $data['direccion'] ?? '',
-                    $data['tipo_usuario'] ?? 'cliente',
-                    $data['id_usuario']
-                ]);
+                echo json_encode(['success' => false, 'error' => 'Faltan campos obligatorios']);
             }
-
-            echo json_encode(["mensaje" => "Usuario actualizado correctamente"]);
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(["error" => $e->getMessage()]);
-        }
-        break;
-
-    case 'DELETE':
-        try {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $id = $data['id_usuario'] ?? $_GET['id'] ?? null;
-
-            if (!$id) {
-                http_response_code(400);
-                echo json_encode(["error" => "Se requiere el ID para eliminar el usuario"]);
-                break;
-            }
-
-            $stmt = $pdo->prepare("DELETE FROM usuarios WHERE id_usuario = ?");
-            $stmt->execute([$id]);
-
-            echo json_encode(["mensaje" => "Usuario eliminado correctamente"]);
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(["error" => $e->getMessage()]);
         }
         break;
 
     default:
         http_response_code(405);
-        echo json_encode(["error" => "Método no permitido"]);
+        echo json_encode(['error' => 'Método no permitido']);
         break;
 }
 ?>

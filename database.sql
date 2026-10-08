@@ -1,53 +1,282 @@
--- Crear y usar la base de datos
-CREATE DATABASE IF NOT EXISTS ferreteria_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE ferreteria_db;
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
 
--- 1. Tabla de Categorías
-CREATE TABLE `categorias` (
-  `id_categoria` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `nombre` varchar(50) NOT NULL,
-  `descripcion` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
--- 2. Tabla de Usuarios
+DROP TABLE IF EXISTS `wishlist`;
+DROP TABLE IF EXISTS `resenas`;
+DROP TABLE IF EXISTS `detalle_pedido`;
+DROP TABLE IF EXISTS `pedidos`;
+DROP TABLE IF EXISTS `productos`;
+DROP TABLE IF EXISTS `categorias`;
+DROP TABLE IF EXISTS `usuarios`;
+
 CREATE TABLE `usuarios` (
-  `id_usuario` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `id_usuario` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) NOT NULL,
   `apellido` varchar(50) NOT NULL,
-  `correo` varchar(100) NOT NULL UNIQUE,
+  `correo` varchar(100) NOT NULL,
   `foto` varchar(255) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `telefono` varchar(20) DEFAULT NULL,
   `direccion` text DEFAULT NULL,
-  `tipo_usuario` enum('cliente','admin') DEFAULT 'cliente'
+  `tipo_usuario` enum('admin','subadmin','cliente') DEFAULT 'cliente',
+  PRIMARY KEY (`id_usuario`),
+  UNIQUE KEY `correo` (`correo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 3. Tabla de Productos 
+INSERT INTO `usuarios` (`id_usuario`, `nombre`, `apellido`, `correo`, `foto`, `password`, `telefono`, `direccion`, `tipo_usuario`) VALUES
+(1, 'Administrador', 'General', 'admin@ferreteria.com', NULL, '$2y$10$9oJ2lfAGkBlsUja1WCOaee.BjM9GZk.QRHZgOJyfZfeVMvgRxwPxS', '55555555', 'Oficina Central Cobán', 'admin'),
+(2, 'Carlos', 'Subadmin', 'subadmin@ferreteria.com', NULL, '$2y$10$9oJ2lfAGkBlsUja1WCOaee.BjM9GZk.QRHZgOJyfZfeVMvgRxwPxS', '44444444', 'Bodega Central Cobán', 'subadmin'),
+(3, 'Elvis', 'Poou', 'elvisalexisp@gmail.com', NULL, '$2y$10$nJ3u/sYumT/Y/dHhOxog9ObkLKLK6isT4orQxeNcpl5j79Sxcgx86', '31379670', 'Cobán Centro', 'cliente'),
+(4, 'Douglas', 'Lázaro', 'douglas@ferreteria.com', NULL, '$2y$10$dudWTl4NtD.rONGV5ZmpwOWomqOYjVHdhbC2obfxXO1ABPFHWGzQ.', '32323232', 'Barrio San Marcos', 'cliente');
+
+CREATE TABLE `categorias` (
+  `id_categoria` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(50) NOT NULL,
+  `descripcion` text DEFAULT NULL,
+  PRIMARY KEY (`id_categoria`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `categorias` (`id_categoria`, `nombre`, `descripcion`) VALUES
+(1, 'Herramientas Eléctricas', 'Herramientas motorizadas y accesorios de alto rendimiento.'),
+(2, 'Materiales de Construcción', 'Cementos, hierros, arenas y bases para obra gris.'),
+(3, 'Plomería y Tubos', 'Tuberías, conexiones, válvulas y accesorios para agua.'),
+(4, 'Pinturas y Acabados', 'Pinturas, impermeabilizantes, brochas y herramientas de acabado.'),
+(5, 'Seguridad y EPP', 'Equipo de protección personal y seguridad industrial.'),
+(6, 'Jardinería y Exteriores', 'Herramientas y accesorios para el cuidado de áreas verdes.'),
+(7, 'Ferretería General', 'Tornillos, clavos, cerraduras y herramientas manuales.');
+
 CREATE TABLE `productos` (
-  `id_producto` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `id_producto` int(11) NOT NULL AUTO_INCREMENT,
   `id_categoria` int(11) DEFAULT NULL,
-  `nombre_categoria` varchar(100) GENERATED ALWAYS AS (
-    case `id_categoria` 
-      when 1 then 'Herramientas Eléctricas' 
-      when 2 then 'Materiales de Construcción' 
-      when 3 then 'Plomería y Tubos' 
-      when 4 then 'Pinturas y Acabados' 
-      when 5 then 'Seguridad y EPP' 
-      else 'General' 
-    end
-  ) STORED,
   `nombre` varchar(100) NOT NULL,
   `descripcion` text DEFAULT NULL,
   `precio` decimal(10,2) NOT NULL,
   `cantidad` int(11) NOT NULL,
-  `imagen` varchar(255) DEFAULT NULL,
+  `imagen` varchar(255) DEFAULT 'default.png',
   `estado` enum('activo','inactivo') DEFAULT 'activo',
-  FOREIGN KEY (`id_categoria`) REFERENCES `categorias` (`id_categoria`)
+  PRIMARY KEY (`id_producto`),
+  KEY `id_categoria` (`id_categoria`),
+  CONSTRAINT `productos_ibfk_1` FOREIGN KEY (`id_categoria`) REFERENCES `categorias` (`id_categoria`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 4. Tabla de Pedidos
+INSERT INTO `productos` (`id_producto`, `id_categoria`, `nombre`, `descripcion`, `precio`, `cantidad`, `imagen`, `estado`) VALUES
+(1, 1, 'Taladro Percutor 1/2" 850W', 'Taladro de alta potencia ideal para concreto y mampostería.', 450.00, 15, 'default.png', 'activo'),
+(2, 1, 'Esmeril Angular 4-1/2" 750W', 'Esmeriladora compacta para corte y desbaste.', 380.00, 12, 'default.png', 'activo'),
+(3, 1, 'Sierra Circular 7-1/4" 1400W', 'Sierra circular profesional para cortes precisos en madera.', 720.00, 8, 'default.png', 'activo'),
+(4, 1, 'Rotomartillo SDS Plus 800W', 'Rotomartillo demoledor con estuche y brocas.', 950.00, 6, 'default.png', 'activo'),
+(5, 1, 'Kit Inalámbrico Taladro + Atornillador', 'Set de herramientas a batería 18V.', 1250.00, 5, 'default.png', 'activo'),
+(6, 1, 'Caladora Pendular 650W', 'Sierra caladora con guía láser.', 410.00, 10, 'default.png', 'activo'),
+(7, 1, 'Lijadora Orbital 300W', 'Lijadora para acabados finos en madera.', 320.00, 14, 'default.png', 'activo'),
+(8, 1, 'Pistola de Calor 2000W', 'Pistola térmica para desprendimiento de pintura y plásticos.', 280.00, 11, 'default.png', 'activo'),
+(9, 1, 'Router Rebajador de Madera 1200W', 'Fresadora profesional para carpintería.', 890.00, 4, 'default.png', 'activo'),
+(10, 1, 'Llave de Impacto Inalámbrica 20V', 'Llave de impacto de alto torque.', 1450.00, 7, 'default.png', 'activo'),
+(11, 1, 'Soldadora Inverter 160A', 'Planta de soldar portátil MMA.', 1100.00, 9, 'default.png', 'activo'),
+(12, 1, 'Minitorno Multiherramienta 135W', 'Kit rotativo con 100 accesorios.', 460.00, 13, 'default.png', 'activo'),
+(13, 1, 'Soporte para Taladro Vertical', 'Base estacionaria de columna.', 250.00, 10, 'default.png', 'activo'),
+(14, 1, 'Mezclador de Pintura y Mortero 1400W', 'Batidor eléctrico industrial.', 830.00, 5, 'default.png', 'activo'),
+(15, 1, 'Sierra Sable 900W', 'Sierra reciprocante para demolición ligera.', 670.00, 8, 'default.png', 'activo'),
+(16, 1, 'Compresor de Aire 24 Litros 2HP', 'Compresor portátil de pistón.', 1650.00, 3, 'default.png', 'activo'),
+(17, 1, 'Hidrolavadora de Alta Presión 1500PSI', 'Lavadora a presión para limpieza profunda.', 980.00, 7, 'default.png', 'activo'),
+(18, 1, 'Aspiradora de Seco y Mojado 5 Galones', 'Aspiradora industrial compacta.', 750.00, 6, 'default.png', 'activo'),
+(19, 1, 'Garlopa Eléctrica 650W', 'Cepillo eléctrico para madera.', 620.00, 9, 'default.png', 'activo'),
+(20, 1, 'Tronzadora de Metal 14" 2000W', 'Cortadora sensitiva de metales.', 1350.00, 4, 'default.png', 'activo'),
+(21, 1, 'Linterna LED Recargable de Trabajo', 'Lámpara portátil de alta intensidad.', 190.00, 20, 'default.png', 'activo'),
+(22, 1, 'Multímetro Digital Profesional', 'Instrumento de medición eléctrica.', 150.00, 25, 'default.png', 'activo'),
+(23, 1, 'Detector de Metales y Cables Pared', 'Escáner digital de muros.', 340.00, 12, 'default.png', 'activo'),
+(24, 1, 'Nivel Láser Autonivelante 15m', 'Nivelación de líneas cruzadas.', 580.00, 8, 'default.png', 'activo'),
+(25, 1, 'Cargador de Baterías para Auto 12V', 'Cargador inteligente de acumuladores.', 410.00, 6, 'default.png', 'activo'),
+(26, 1, 'Esmeril de Banco 6" 370W', 'Amoladora de banco doble piedra.', 690.00, 5, 'default.png', 'activo'),
+(27, 1, 'Pistola para Silicona Caliente Industrial', 'Aplicador térmico de barras 11mm.', 120.00, 30, 'default.png', 'activo'),
+(28, 1, 'Taladro Angular a Batería', 'Taladro de cabeza compacta para espacios reducidos.', 990.00, 4, 'default.png', 'activo'),
+(29, 1, 'Sierra Ingletadora 10" 1800W', 'Sierra de banco para ingletes y cortes transversales.', 1850.00, 3, 'default.png', 'activo'),
+(30, 1, 'Generador de Corriente Gasolina 2.5KW', 'Planta eléctrica portátil de emergencia.', 3200.00, 2, 'default.png', 'activo'),
+
+(31, 2, 'Saco de Cemento Progreso 50kg', 'Cemento Portland gris estructural.', 85.00, 150, 'default.png', 'activo'),
+(32, 2, 'Varilla de Hierro 3/8" Grado 40', 'Varilla corrugada de refuerzo.', 65.00, 200, 'default.png', 'activo'),
+(33, 2, 'Varilla de Hierro 1/2" Grado 40', 'Varilla estructural pesada.', 115.00, 120, 'default.png', 'activo'),
+(34, 2, 'Varilla de Hierro 1/4"', 'Varilla para eslabones y estribos.', 32.00, 180, 'default.png', 'activo'),
+(35, 2, 'Varilla de Hierro 5/8"', 'Varilla de alta resistencia.', 180.00, 90, 'default.png', 'activo'),
+(36, 2, 'Metro Cúbico de Arena de Río', 'Arena fina para repellos y cernidos.', 160.00, 30, 'default.png', 'activo'),
+(37, 2, 'Metro Cúbico de Piedrín', 'Agregado fino para concreto.', 180.00, 25, 'default.png', 'activo'),
+(38, 2, 'Metro Cúbico de Selecto', 'Material de relleno y compactación.', 140.00, 40, 'default.png', 'activo'),
+(39, 2, 'Block de Pómez 15x20x40 cm', 'Block aligerado para muros.', 7.50, 500, 'default.png', 'activo'),
+(40, 2, 'Block de Pómez 10x20x40 cm', 'Block divisorio ligero.', 6.20, 400, 'default.png', 'activo'),
+(41, 2, 'Block de Pómez 20x20x40 cm', 'Block pesado estructural.', 9.50, 300, 'default.png', 'activo'),
+(42, 2, 'Ladrillo Terracota Estándar', 'Barro cocido para construcción.', 3.20, 800, 'default.png', 'activo'),
+(43, 2, 'Laminas de Zinc Alum 3.66m (12 pies)', 'Lámina acanalada galvanizada.', 95.00, 75, 'default.png', 'activo'),
+(44, 2, 'Lámina de Zinc Alum 3.00m (10 pies)', 'Lámina protectora para techos.', 80.00, 85, 'default.png', 'activo'),
+(45, 2, 'Lámina Plastificada Termoacústica', 'Techo aislante térmico.', 220.00, 40, 'default.png', 'activo'),
+(46, 2, 'Malla Electrosoldada 6x6 10/10', 'Malla de acero para pisos y losas.', 195.00, 50, 'default.png', 'activo'),
+(47, 2, 'Alambre de Amarrar (Quintal)', 'Alambre recocido blando.', 450.00, 15, 'default.png', 'activo'),
+(48, 2, 'Clavos para Concreto 2" (Libra)', 'Clavo acerado de alta penetración.', 18.00, 100, 'default.png', 'activo'),
+(49, 2, 'Clavos con Cabeza 3" (Libra)', 'Clavo común para madera.', 14.00, 120, 'default.png', 'activo'),
+(50, 2, 'Cal Hidratada Saco 25kg', 'Cal para mezclas y albañilería.', 42.00, 60, 'default.png', 'activo'),
+(51, 2, 'Aditivo Impermeabilizante Sika 1 (Galón)', 'Resistencia a humedad en morteros.', 135.00, 25, 'default.png', 'activo'),
+(52, 2, 'Pegamento para Cerámica Pega-Piso Saco', 'Adhesivo en polvo para pisos.', 55.00, 90, 'default.png', 'activo'),
+(53, 2, 'Tubo de Cartón para Columna (Casetón)', 'Molde tubular para columnas.', 85.00, 30, 'default.png', 'activo'),
+(54, 2, 'Curador para Concreto Balde', 'Sustancia selladora superficial.', 240.00, 12, 'default.png', 'activo'),
+(55, 2, 'Fibra de Polipropileno para Concreto (Bol)', 'Refuerzo secundario anti-fisuras.', 35.00, 50, 'default.png', 'activo'),
+(56, 2, 'Plástico Negro para Cimentación (Rollo)', 'Protección contra humedad de suelo.', 180.00, 20, 'default.png', 'activo'),
+(57, 2, 'Perfil C de Acero Purlin 2x4"', 'Estructura metálica para techos.', 210.00, 35, 'default.png', 'activo'),
+(58, 2, 'Angulo de Hierro 1" x 1/8"', 'Perfil estructural metálico.', 95.00, 45, 'default.png', 'activo'),
+(59, 2, 'Plancha de Policarbonato Alveolar', 'Cubierta translúcida para iluminación.', 480.00, 15, 'default.png', 'activo'),
+(60, 2, 'Yeso Agrícola/Construcción Saco', 'Yeso en polvo de fraguado rápido.', 50.00, 40, 'default.png', 'activo'),
+
+(61, 3, 'Tubo PVC 1/2" C 40 (6m)', 'Tubería para agua potable a presión.', 45.00, 40, 'default.png', 'activo'),
+(62, 3, 'Tubo PVC 3/4" C 40 (6m)', 'Conducción hidráulica.', 65.00, 35, 'default.png', 'activo'),
+(63, 3, 'Tubo PVC 1" C 40 (6m)', 'Tubería principal de agua.', 95.00, 30, 'default.png', 'activo'),
+(64, 3, 'Tubo PVC 2" para Desagüe (6m)', 'Drenajes y aguas grises.', 75.00, 25, 'default.png', 'activo'),
+(65, 3, 'Tubo PVC 3" para Desagüe (6m)', 'Bajadas pluviales y sanitarias.', 120.00, 20, 'default.png', 'activo'),
+(66, 3, 'Tubo PVC 4" para Inodoro (6m)', 'Drenaje sanitario principal.', 175.00, 22, 'default.png', 'activo'),
+(67, 3, 'Pegamento para PVC Frasco 1/4"', 'Adhesivo solvente resistente.', 35.00, 50, 'default.png', 'activo'),
+(68, 3, 'Limpiador/Primario para PVC', 'Desengrasante disolvente.', 30.00, 40, 'default.png', 'activo'),
+(69, 3, 'Llave de Esfera de Bronce 1/2"', 'Válvula de paso roscada.', 42.00, 30, 'default.png', 'activo'),
+(70, 3, 'Llave de Esfera de Bronce 3/4"', 'Válvula de paso mayor.', 60.00, 25, 'default.png', 'activo'),
+(71, 3, 'Cinta de Teflon Profesional (10m)', 'Sellador de roscas denso.', 6.00, 120, 'default.png', 'activo'),
+(72, 3, 'Sifón Flexible para Fregadero', 'Desagüe ajustable para lavatrastos.', 28.00, 25, 'default.png', 'activo'),
+(73, 3, 'Llave Mezcladora para Fregadero', 'Grifería de acero para cocina.', 180.00, 15, 'default.png', 'activo'),
+(74, 3, 'Llave Mezcladora para Lavabo', 'Grifería de baño económica.', 150.00, 18, 'default.png', 'activo'),
+(75, 3, 'Inodoro One Piece Cerámica Blanca', 'Sanitario ahorrador completo.', 950.00, 6, 'default.png', 'activo'),
+(76, 3, 'Registro Sanitario PVC 4"', 'Tapa registro para inspección.', 45.00, 20, 'default.png', 'activo'),
+(77, 3, 'Codo PVC 1/2" 90 Grados', 'Conexión hidráulica ángulo.', 2.50, 150, 'default.png', 'activo'),
+(78, 3, 'Tee PVC 1/2" Roscada', 'Conexión en T.', 3.50, 130, 'default.png', 'activo'),
+(79, 3, 'Reducción bushing PVC 3/4" a 1/2"', 'Adaptador de medidas.', 3.00, 100, 'default.png', 'activo'),
+(80, 3, 'Flotador para Tinaco 1/2"', 'Válvula de boya automática.', 65.00, 15, 'default.png', 'activo'),
+(81, 3, 'Tinaco Rotoplas 1100 Litros Tricapa', 'Almacenamiento seguro de agua.', 1650.00, 4, 'default.png', 'activo'),
+(82, 3, 'Bomba Periférica de Agua 0.5HP', 'Presurizador para vivienda.', 550.00, 8, 'default.png', 'activo'),
+(83, 3, 'Bomba Centrífuga 1HP', 'Bombeo de caudal alto.', 1150.00, 5, 'default.png', 'activo'),
+(84, 3, 'Manguera Mallonada para Agua 1/2" (Rollo 50m)', 'Conducción flexible.', 220.00, 10, 'default.png', 'activo'),
+(85, 3, 'Empaque de Cera para Inodoro', 'Sellador anti-olores.', 25.00, 30, 'default.png', 'activo'),
+(86, 3, 'Llave Angular Cromada 1/2" x 3/8"', 'Llave de gaveta para lavabo.', 38.00, 25, 'default.png', 'activo'),
+(87, 3, 'Flexometálico para Inodoro 40cm', 'Conector flexible de agua.', 32.00, 35, 'default.png', 'activo'),
+(88, 3, 'Sumidero / Coladera de Piso Acero', 'Rejilla desagüe de piso.', 22.00, 40, 'default.png', 'activo'),
+(89, 3, 'Tubo PPR Termofusión 1/2" (4m)', 'Tubería alta presión caliente/fría.', 55.00, 20, 'default.png', 'activo'),
+(90, 3, 'Codo PPR 1/2" Termofusión', 'Conexión fusión térmica.', 4.00, 80, 'default.png', 'activo'),
+
+(91, 4, 'Pintura de Aceite Blanca Galón', 'Esmalte sintético brillante duradero.', 120.00, 18, 'default.png', 'activo'),
+(92, 4, 'Pintura de Aceite Negra Galón', 'Esmalte sintético negro.', 120.00, 15, 'default.png', 'activo'),
+(93, 4, 'Pintura de Aceite Roja Galón', 'Esmalte sintético tono rojo.', 125.00, 10, 'default.png', 'activo'),
+(94, 4, 'Pintura Vinílica Blanca 5 Galones (Tipo A)', 'Pintura látex para paredes.', 650.00, 8, 'default.png', 'activo'),
+(95, 4, 'Pintura Vinílica Blanco Hueso 5 Galones', 'Pintura interior/exterior.', 620.00, 10, 'default.png', 'activo'),
+(96, 4, 'Impermeabilizante Rouzo 5 Galones', 'Membrana líquida acrílica techos.', 450.00, 10, 'default.png', 'activo'),
+(97, 4, 'Impermeabilizante Elastomérico 3 Años (Galón)', 'Protección contra filtraciones.', 110.00, 20, 'default.png', 'activo'),
+(98, 4, 'Brocha de Cerdas de 2"', 'Brocha económica acabados.', 12.00, 50, 'default.png', 'activo'),
+(99, 4, 'Brocha de Cerdas de 3"', 'Brocha profesional aplicación.', 18.00, 60, 'default.png', 'activo'),
+(100, 4, 'Brocha de Cerdas de 4"', 'Brocha ancha para muros.', 25.00, 40, 'default.png', 'activo'),
+(101, 4, 'Lijas para Madera Grano 80 (Paquete)', 'Pliegos flexibles desbaste.', 25.00, 40, 'default.png', 'activo'),
+(102, 4, 'Lijas para Madera Grano 120 (Paquete)', 'Pliegos acabado intermedio.', 25.00, 40, 'default.png', 'activo'),
+(103, 4, 'Lija al Agua Grano 400 (Pliego)', 'Lijado de metales y pinturas.', 6.00, 60, 'default.png', 'activo'),
+(104, 4, 'Rodillo Antigota 9" con Mango', 'Pintura vinílica sin salpicaduras.', 35.00, 22, 'default.png', 'activo'),
+(105, 4, 'Rollo de Repuesto para Rodillo 9"', 'Funda recambio.', 18.00, 30, 'default.png', 'activo'),
+(106, 4, 'Masilla Plástica para Paredes 1 Galón', 'Compuesto alisador imperfecciones.', 65.00, 15, 'default.png', 'activo'),
+(107, 4, 'Saka-Manchas / Sellador Anti-Hongo Galón', 'Preparación de superficies.', 95.00, 12, 'default.png', 'activo'),
+(108, 4, 'Thinner Acrílico Galón', 'Diluyente de esmaltes y limpieza.', 75.00, 20, 'default.png', 'activo'),
+(109, 4, 'Aguarrás / Solvente Mineral Galón', 'Disolvente estándar.', 60.00, 25, 'default.png', 'activo'),
+(110, 4, 'Cinta de Enmascarar / Masking Tape 3/4"', 'Protección de bordes.', 15.00, 80, 'default.png', 'activo'),
+(111, 4, 'Lana de Acero (Viruta) Paquete', 'Pulido y limpieza de superficies.', 14.00, 45, 'default.png', 'activo'),
+(112, 4, 'Espátula de Acero 3"', 'Herramienta para masilla.', 18.00, 35, 'default.png', 'activo'),
+(113, 4, 'Espátula de Acero 5"', 'Herramienta ancha.', 24.00, 30, 'default.png', 'activo'),
+(114, 4, 'Llana Metálica Dentada', 'Aplicación de adhesivos de cerámica.', 42.00, 20, 'default.png', 'activo'),
+(115, 4, 'Bandeja Plástica para Pintura', 'Contenedor para rodillo.', 28.00, 25, 'default.png', 'activo'),
+(116, 4, 'Pintura en Spray Negro Mate 400ml', 'Esmalte aerosol rápido.', 38.00, 40, 'default.png', 'activo'),
+(117, 4, 'Pintura en Spray Aluminio / Metálico', 'Aerosol acabado brillante.', 40.00, 35, 'default.png', 'activo'),
+(118, 4, 'Pintura para Tráfico / Pisos Galón', 'Esmalte alta resistencia abrasión.', 160.00, 10, 'default.png', 'activo'),
+(119, 4, 'Barniz Marino Transparente Galón', 'Protección madera exterior.', 140.00, 14, 'default.png', 'activo'),
+(120, 4, 'Tinte para Madera Nogal 1 Litro', 'Colorante penetrante.', 50.00, 18, 'default.png', 'activo'),
+
+(121, 5, 'Casco de Seguridad Industrial con Suspensión', 'Protección de polietileno.', 45.00, 35, 'default.png', 'activo'),
+(122, 5, 'Guantes de Carnaza Reforzados', 'Protección para carga pesada.', 22.00, 50, 'default.png', 'activo'),
+(123, 5, 'Guantes de Nitrilo Antideslizantes (Par)', 'Manipulación fina y aceites.', 15.00, 70, 'default.png', 'activo'),
+(124, 5, 'Lentes de Protección Transparentes', 'Gafas anti-rayones UV.', 18.00, 45, 'default.png', 'activo'),
+(125, 5, 'Lentes de Protección Oscuros', 'Gafas solares industriales.', 18.00, 40, 'default.png', 'activo'),
+(126, 5, 'Mascarilla contra Polvo N95 (Caja 10)', 'Protección partículas y cemento.', 75.00, 20, 'default.png', 'activo'),
+(127, 5, 'Respirador de Doble Vía con Filtros', 'Protección gases y vapores.', 190.00, 12, 'default.png', 'activo'),
+(128, 5, 'Botas de Hule Industriales con Puntera', 'Calzado impermeable acero.', 140.00, 14, 'default.png', 'activo'),
+(129, 5, 'Botas de Cuero Industriales con Puntera', 'Calzado dieléctrico.', 320.00, 10, 'default.png', 'activo'),
+(130, 5, 'Arnés de Seguridad para Alturas', 'Protección caídas certificado.', 290.00, 8, 'default.png', 'activo'),
+(131, 5, 'Eslinga / Banda de Anclaje con Gancho', 'Línea de vida.', 180.00, 10, 'default.png', 'activo'),
+(132, 5, 'Chaleco Reflectivo Alta Visibilidad', 'Seguridad vial y obra.', 35.00, 50, 'default.png', 'activo'),
+(133, 5, 'Protectores Auditivos de Copesa / Orejeras', 'Atenuación de ruido.', 65.00, 22, 'default.png', 'activo'),
+(134, 5, 'Tapones Auditivos de Silicona (Par)', 'Protección reutilizable.', 12.00, 60, 'default.png', 'activo'),
+(135, 5, 'Cono de Seguridad Vial Naranja 70cm', 'Delimitación de áreas.', 75.00, 25, 'default.png', 'activo'),
+(136, 5, 'Cinta de Precaución Peligro (Rollo 300m)', 'Señalización de obras.', 55.00, 30, 'default.png', 'activo'),
+(137, 5, 'Careta para Soldar Electrónica', 'Protección facial fotosensible.', 310.00, 7, 'default.png', 'activo'),
+(138, 5, 'Guantes de Soldador Carnaza Larga', 'Protección térmica.', 45.00, 20, 'default.png', 'activo'),
+(139, 5, 'Rodilleras Protectoras para Albañil', 'Confort en pisos.', 85.00, 15, 'default.png', 'activo'),
+(140, 5, 'Faja Lumbar de Soporte Ergonómico', 'Prevención lesiones de columna.', 95.00, 18, 'default.png', 'activo'),
+
+(141, 6, 'Machete Gavilán 22"', 'Hoja acero al carbono campo.', 65.00, 25, 'default.png', 'activo'),
+(142, 6, 'Lima Triangular para Machete 8"', 'Afilado de herramientas.', 18.00, 40, 'default.png', 'activo'),
+(143, 6, 'Azadón Ojo Redondo 3 Libras', 'Labranza de tierra.', 95.00, 12, 'default.png', 'activo'),
+(144, 6, 'Pala Metálica Redonda con Mango', 'Excavación y jardinería.', 110.00, 15, 'default.png', 'activo'),
+(145, 6, 'Pala Metálica Cuadrada con Mango', 'Movimiento de arena/tierra.', 110.00, 14, 'default.png', 'activo'),
+(146, 6, 'Carretilla de Mano Rueda Maciza', 'Transporte de materiales obra.', 380.00, 8, 'default.png', 'activo'),
+(147, 6, 'Manguera de Riego 1/2" (Rollo 25m)', 'Jardinería doméstica.', 130.00, 18, 'default.png', 'activo'),
+(148, 6, 'Pistola Rociadora de Agua Multichorro', 'Riego para jardín.', 45.00, 25, 'default.png', 'activo'),
+(149, 6, 'Tijera de Podar Manual para Plantas', 'Corte de ramas y arbustos.', 55.00, 20, 'default.png', 'activo'),
+(150, 6, 'Arco de Sierra para Poda con Hoja', 'Corte de madera verde.', 85.00, 12, 'default.png', 'activo'),
+(151, 6, 'Rastrillo Metálico de 14 Dientes', 'Limpieza de hojas y césped.', 75.00, 15, 'default.png', 'activo'),
+(152, 6, 'Bomba de Fumigación Manual 16 Litros', 'Aspersión agrícola.', 280.00, 9, 'default.png', 'activo'),
+(153, 6, 'Guadaña / Desmalezadora a Gasolina 2T', 'Corte de maleza extensiva.', 1850.00, 3, 'default.png', 'activo'),
+(154, 6, 'Machete Tramontina 18"', 'Herramienta agrícola.', 58.00, 30, 'default.png', 'activo'),
+(155, 6, 'Hacha de Leñador 3.5 Libras', 'Corte de troncos.', 195.00, 7, 'default.png', 'activo'),
+(156, 6, 'Machete Cacha de Plástico 20"', 'Herramienta de corte.', 60.00, 22, 'default.png', 'activo'),
+(157, 6, 'Aspersor de Impacto para Riego', 'Aspersión de jardines grandes.', 65.00, 10, 'default.png', 'activo'),
+(158, 6, 'Malla Sombra Negra 80% (Metro lineal)', 'Protección solar cultivos.', 25.00, 50, 'default.png', 'activo'),
+(159, 6, 'Fumigadora Manual de Presión 2 Litros', 'Jardinería menor.', 42.00, 20, 'default.png', 'activo'),
+(160, 6, 'Tijera Cortasetos de Manos Largas', 'Diseño paisajístico.', 140.00, 8, 'default.png', 'activo'),
+
+(161, 7, 'Candado Acero Templado 50mm', 'Alta seguridad anti-corte.', 55.00, 30, 'default.png', 'activo'),
+(162, 7, 'Candado Acero Templado 40mm', 'Seguridad mediana.', 42.00, 35, 'default.png', 'activo'),
+(163, 7, 'Cerradura de Embutir para Puerta Madera', 'Chapa principal.', 180.00, 15, 'default.png', 'activo'),
+(164, 7, 'Cerradura de Bola para Baño / Recámara', 'Chapa cilíndrica.', 110.00, 20, 'default.png', 'activo'),
+(165, 7, 'Juego de Llaves Allen Milimétricas (Set 9)', 'Hexagonales.', 35.00, 40, 'default.png', 'activo'),
+(166, 7, 'Juego de Llaves Allen Standard (Set 9)', 'Pulgadas.', 35.00, 40, 'default.png', 'activo'),
+(167, 7, 'Juego de Destornilladores Pro (Set 6)', 'Planos y de estrella.', 65.00, 30, 'default.png', 'activo'),
+(168, 7, 'Martillo uña 16 oz Mango de Fibra', 'Golpeteo y extracción clavos.', 55.00, 45, 'default.png', 'activo'),
+(169, 7, 'Martillo uña 20 oz Profesional', 'Alto impacto.', 75.00, 25, 'default.png', 'activo'),
+(170, 7, 'Pinza de Presión C-Clamp 10"', 'Mordaza de sujeción.', 65.00, 25, 'default.png', 'activo'),
+(171, 7, 'Alicate de Corte Diagonal 6"', 'Corte de cables.', 45.00, 30, 'default.png', 'activo'),
+(172, 7, 'Pinza de Electricista Universal 8"', 'Herramienta aislada.', 55.00, 35, 'default.png', 'activo'),
+(173, 7, 'Llave Inglesa / Ajustable 8"', 'Mordaza móvil.', 48.00, 30, 'default.png', 'activo'),
+(174, 7, 'Llave Inglesa / Ajustable 12"', 'Tamaño grande.', 85.00, 18, 'default.png', 'activo'),
+(175, 7, 'Flexómetro / Cinta Métrica 5 Metros', 'Medición precisa.', 32.00, 50, 'default.png', 'activo'),
+(176, 7, 'Flexómetro / Cinta Métrica 8 Metros', 'Medición larga.', 50.00, 40, 'default.png', 'activo'),
+(177, 7, 'Nivel de Aluminio con Gotas 24"', 'Plomada y nivel.', 65.00, 20, 'default.png', 'activo'),
+(178, 7, 'Arco de Sierra para Metales Profesional', 'Corte perfiles.', 52.00, 25, 'default.png', 'activo'),
+(179, 7, 'Cuchilla / Cutter Retráctil con 3 Cuchillas', 'Corte cartón y plásticos.', 18.00, 60, 'default.png', 'activo'),
+(180, 7, 'Juego de Brocas para Concreto (Set 5)', 'Perforación mampostería.', 45.00, 30, 'default.png', 'activo'),
+(181, 7, 'Juego de Brocas para Madera (Set 5)', 'Guías espirales.', 40.00, 30, 'default.png', 'activo'),
+(182, 7, 'Juego de Brocas para Metal HSS (Set 13)', 'Acero rápido.', 75.00, 25, 'default.png', 'activo'),
+(183, 7, 'Tornillos para Madera 1-1/2" (Caja 100)', 'Fijación.', 25.00, 40, 'default.png', 'activo'),
+(184, 7, 'Tuz / Tarugos Plásticos 1/4" (Caja 100)', 'Anclajes de pared.', 18.00, 50, 'default.png', 'activo'),
+(185, 7, 'Pijas / Tornillos Autorroscantes (Caja 100)', 'Unión láminas y metales.', 28.00, 45, 'default.png', 'activo'),
+(186, 7, 'Grasa Multiusos Chasis (Tarro 450g)', 'Lubricación mecánica.', 32.00, 25, 'default.png', 'activo'),
+(187, 7, 'Aceite Lubricante Aflojatodo WD-40 400ml', 'Desoxidante.', 45.00, 50, 'default.png', 'activo'),
+(188, 7, 'Lija de Esmeril Grano 60 (Hoja)', 'Desbaste áspero.', 6.00, 70, 'default.png', 'activo'),
+(189, 7, 'Pistola Aplicadora de Silicón en Cartucho', 'Calafateo.', 35.00, 30, 'default.png', 'activo'),
+(190, 7, 'Silicón Antihongo Transparente Cartucho', 'Sellador sanitario.', 38.00, 40, 'default.png', 'activo'),
+(191, 7, 'Cinta Aislar / Eléctrica Negra 3M', 'Aislamiento cables.', 12.00, 90, 'default.png', 'activo'),
+(192, 7, 'Precintos / Cinchos Plásticos 20cm (Paquete 100)', 'Sujeción cables.', 22.00, 60, 'default.png', 'activo'),
+(193, 7, 'Gafas de Foco / Lupa de Mano', 'Inspección detalle.', 25.00, 20, 'default.png', 'activo'),
+(194, 7, 'Imán Telescópico Recoge-Tornillos', 'Recuperación de piezas.', 30.00, 15, 'default.png', 'activo'),
+(195, 7, 'Escuadra Metálica de Carpintero 12"', 'Trazo 90 y 45 grados.', 45.00, 30, 'default.png', 'activo'),
+(196, 7, 'Cincel Plano de Acero para Concreto 8"', 'Demolición manual.', 35.00, 25, 'default.png', 'activo'),
+(197, 7, 'Punta de Demolición / Barreno Hexagonal', 'Cincel pesado.', 120.00, 10, 'default.png', 'activo'),
+(198, 7, 'Gato Hidráulico de Botella 2 Toneladas', 'Elevación carga.', 160.00, 12, 'default.png', 'activo'),
+(199, 7, 'Llave de Rrueda en Cruz para Auto', 'Desapriete de birlos.', 110.00, 15, 'default.png', 'activo'),
+(200, 7, 'Juego de Copas / Dados Llave Crique (Set 40)', 'Mecánica general.', 290.00, 14, 'default.png', 'activo'),
+(201, 7, 'Cinta Doble Faz Espuma (Rollo)', 'Adhesivo de montaje.', 25.00, 35, 'default.png', 'activo'),
+(202, 7, 'Rueda para Carretilla de Hule Macizo', 'Repuesto carretilla.', 95.00, 10, 'default.png', 'activo');
+
 CREATE TABLE `pedidos` (
-  `id_pedido` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `id_pedido` int(11) NOT NULL AUTO_INCREMENT,
   `id_usuario` int(11) DEFAULT NULL,
   `fecha` timestamp NOT NULL DEFAULT current_timestamp(),
   `total` decimal(10,2) NOT NULL,
@@ -55,53 +284,51 @@ CREATE TABLE `pedidos` (
   `nit` varchar(50) DEFAULT NULL,
   `nombre_factura` varchar(255) DEFAULT NULL,
   `estado` varchar(50) DEFAULT 'Pendiente',
-  FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`)
+  PRIMARY KEY (`id_pedido`),
+  KEY `id_usuario` (`id_usuario`),
+  CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 5. Tabla de Detalle de Pedidos
 CREATE TABLE `detalle_pedido` (
-  `id_detalle` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `id_detalle` int(11) NOT NULL AUTO_INCREMENT,
   `id_pedido` int(11) DEFAULT NULL,
   `id_producto` int(11) DEFAULT NULL,
   `cantidad` int(11) NOT NULL,
   `precio` decimal(10,2) NOT NULL,
-  FOREIGN KEY (`id_pedido`) REFERENCES `pedidos` (`id_pedido`),
-  FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`)
+  PRIMARY KEY (`id_detalle`),
+  KEY `id_pedido` (`id_pedido`),
+  KEY `id_producto` (`id_producto`),
+  CONSTRAINT `detalle_pedido_ibfk_1` FOREIGN KEY (`id_pedido`) REFERENCES `pedidos` (`id_pedido`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `detalle_pedido_ibfk_2` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 6. Tabla de Reseñas
 CREATE TABLE `resenas` (
-  `id_resena` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `id_resena` int(11) NOT NULL AUTO_INCREMENT,
   `id_usuario` int(11) DEFAULT NULL,
   `id_producto` int(11) DEFAULT NULL,
   `calificacion` int(11) DEFAULT NULL CHECK (`calificacion` between 1 and 5),
   `comentario` text DEFAULT NULL,
   `fecha` timestamp NOT NULL DEFAULT current_timestamp(),
-  FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`),
-  FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`)
+  PRIMARY KEY (`id_resena`),
+  KEY `id_usuario` (`id_usuario`),
+  KEY `id_producto` (`id_producto`),
+  CONSTRAINT `resenas_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `resenas_ibfk_2` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 7. Tabla de Wishlist (Lista de Deseos)
 CREATE TABLE `wishlist` (
-  `id_wishlist` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `id_wishlist` int(11) NOT NULL AUTO_INCREMENT,
   `id_usuario` int(11) DEFAULT NULL,
   `id_producto` int(11) DEFAULT NULL,
-  FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`),
-  FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`)
+  PRIMARY KEY (`id_wishlist`),
+  KEY `id_usuario` (`id_usuario`),
+  KEY `id_producto` (`id_producto`),
+  CONSTRAINT `wishlist_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `wishlist_ibfk_2` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ==========================================
--- DATOS INICIALES (CATEGORÍAS Y USUARIO ADMIN)
--- ==========================================
+COMMIT;
 
--- Insertar categorías iniciales
-INSERT INTO `categorias` (`id_categoria`, `nombre`, `descripcion`) VALUES
-(1, 'Herramientas Eléctricas', NULL),
-(2, 'Materiales de Construcción', NULL),
-(3, 'Plomería y Tubos', NULL),
-(4, 'Pinturas y Acabados', NULL),
-(5, 'Seguridad y EPP', NULL);
-
--- Insertar usuario Administrador por defecto (Contraseña: admin123)
-INSERT INTO `usuarios` (`nombre`, `apellido`, `correo`, `password`, `telefono`, `direccion`, `tipo_usuario`) 
-VALUES ('Administrador', 'General', 'admin@ferreteria.com', '$2y$10$TKh8H1.PfQx37YgCzwiKb.KjNyWgaHb9cbcoQgdIVFlYg7B77UdFm', '55555555', 'Cobán', 'admin');
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

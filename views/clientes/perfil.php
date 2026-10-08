@@ -15,13 +15,13 @@ if (is_array($id_usuario)) {
     $id_usuario = $id_usuario['id_usuario'] ?? 1;
 }
 
-require_once __DIR__ . '/../../models/Database.php';
+require_once __DIR__ . '/../../config/conexion.php';
 
 $mensaje = '';
 $error = '';
 
 try {
-    $pdo = Database::conectar();
+    $pdo = conexion::conectar();
 } catch (Exception $e) {
     die("Error de conexión a la base de datos.");
 }
@@ -63,19 +63,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                         $nombre_archivo_db = $nuevoNombreFoto;
                     } else {
-                        $error = "❌ Error al mover la imagen cargada al servidor.";
+                        $error = "Error al mover la imagen cargada al servidor.";
                     }
                 } else {
-                    $error = "❌ Formato de imagen no permitido. Usa JPG, JPEG, PNG o WEBP.";
+                    $error = "Formato de imagen no permitido. Usa JPG, JPEG, PNG o WEBP.";
                 }
             }
 
             if (empty($error)) {
                 if (!empty($password_nueva)) {
                     if (empty($password_actual)) {
-                        $error = "⚠️ Debes ingresar tu contraseña actual para poder establecer una nueva.";
+                        $error = "Debes ingresar tu contraseña actual para poder establecer una nueva.";
                     } elseif ($password_nueva !== $password_confirmar) {
-                        $error = "❌ Las nuevas contraseñas no coinciden.";
+                        $error = "Las nuevas contraseñas no coinciden.";
                     } else {
                         if (password_verify($password_actual, $datosActuales['password'] ?? '')) {
                             $nuevo_hash = password_hash($password_nueva, PASSWORD_DEFAULT);
@@ -84,9 +84,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $update->execute([$nombre, $apellido, $correo, $nuevo_hash, $nombre_archivo_db, $id_usuario]);
 
                             $_SESSION['nombre'] = $nombre . ' ' . $apellido;
-                            $mensaje = "✅ Datos, contraseña y foto actualizados correctamente.";
+                            $_SESSION['foto'] = $nombre_archivo_db;
+                            $mensaje = "Datos, contraseña y foto actualizados correctamente.";
                         } else {
-                            $error = "❌ La contraseña actual que ingresaste es incorrecta.";
+                            $error = "La contraseña actual que ingresaste es incorrecta.";
                         }
                     }
                 } else {
@@ -94,14 +95,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $update->execute([$nombre, $apellido, $correo, $nombre_archivo_db, $id_usuario]);
 
                     $_SESSION['nombre'] = $nombre . ' ' . $apellido;
-                    $mensaje = "✅ Información personal y foto actualizadas correctamente.";
+                    $_SESSION['foto'] = $nombre_archivo_db;
+                    $mensaje = "Información personal y foto actualizadas correctamente.";
                 }
             }
         } catch (Exception $e) {
-            $error = "❌ Error al actualizar los datos: " . $e->getMessage();
+            $error = "Error al actualizar los datos: " . $e->getMessage();
         }
     } else {
-        $error = "⚠️ Los campos de nombre, apellido y correo son obligatorios.";
+        $error = "Los campos de nombre, apellido y correo son obligatorios.";
     }
 }
 
@@ -111,153 +113,21 @@ $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$usuario) {
     $usuario = ['nombre' => '', 'apellido' => '', 'correo' => '', 'foto' => ''];
+} else {
+    // Asegurar que la sesión tenga la foto actualizada
+    $_SESSION['foto'] = $usuario['foto'];
 }
 
+$directorio_raiz = $directorio_raiz ?? "http://localhost/FerreteriaElConstructor/";
+
 include __DIR__ . '/../layouts/header_cliente.php';
-$base_url = "http://localhost/FerreteriaElConstructor/";
 ?>
 
-<style>
-    .perfil-dashboard-container {
-        max-width: 800px;
-        margin: 30px auto;
-        padding: 20px;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    .perfil-card {
-        background: #ffffff;
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        border: 1px solid #e2e8f0;
-    }
-
-    .perfil-title {
-        color: #0f172a;
-        margin-top: 0;
-        font-size: 1.6rem;
-    }
-
-    .perfil-subtitle {
-        color: #64748b;
-        font-size: 0.95rem;
-        margin-bottom: 20px;
-    }
-
-    .perfil-alert-success {
-        background: #ecfdf5;
-        color: #047857;
-        padding: 12px;
-        border-radius: 8px;
-        margin-bottom: 15px;
-        font-weight: 600;
-    }
-
-    .perfil-alert-error {
-        background: #fee2e2;
-        color: #b91c1c;
-        padding: 12px;
-        border-radius: 8px;
-        margin-bottom: 15px;
-        font-weight: 600;
-    }
-
-    .perfil-foto-section {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        margin-bottom: 25px;
-        background: #f8fafc;
-        padding: 15px;
-        border-radius: 8px;
-    }
-
-    .perfil-avatar-wrapper {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        overflow: hidden;
-        background: #cbd5e1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2rem;
-        border: 2px solid #cbd5e1;
-    }
-
-    .perfil-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .perfil-grid-2 {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-        margin-bottom: 15px;
-    }
-
-    .perfil-form-group {
-        margin-bottom: 15px;
-    }
-
-    .perfil-label {
-        display: block;
-        font-weight: 600;
-        color: #334155;
-        margin-bottom: 5px;
-        font-size: 0.9rem;
-    }
-
-    .perfil-input {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #cbd5e1;
-        border-radius: 6px;
-        font-size: 0.95px;
-        box-sizing: border-box;
-        outline: none;
-    }
-
-    .perfil-input:focus {
-        border-color: #2563eb;
-    }
-
-    .perfil-divider {
-        border: 0;
-        border-top: 1px solid #e2e8f0;
-        margin: 25px 0;
-    }
-
-    .perfil-section-title {
-        color: #1e293b;
-        font-size: 1.2rem;
-        margin-bottom: 5px;
-    }
-
-    .perfil-btn-submit {
-        background: #2563eb;
-        color: white;
-        border: none;
-        padding: 12px 20px;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        width: 100%;
-        font-size: 1rem;
-        transition: background 0.2s;
-    }
-
-    .perfil-btn-submit:hover {
-        background: #1d4ed8;
-    }
-</style>
+<link rel="stylesheet" href="<?php echo $directorio_raiz; ?>assets/css/perfil.css">
 
 <div class="perfil-dashboard-container">
     <div class="perfil-card">
-        <h2 class="perfil-title">👤 Configuración de Mi Perfil</h2>
+        <h2 class="perfil-title">Configuración de Mi Perfil</h2>
         <p class="perfil-subtitle">Actualiza tu información personal, fotografía o cambia tu contraseña de acceso.</p>
 
         <?php if (!empty($mensaje)): ?>
@@ -276,16 +146,16 @@ $base_url = "http://localhost/FerreteriaElConstructor/";
             <div class="perfil-foto-section">
                 <div class="perfil-avatar-wrapper">
                     <?php if (!empty($usuario['foto']) && file_exists(__DIR__ . "/../../uploads/" . $usuario['foto'])): ?>
-                        <img src="<?php echo $base_url . 'uploads/' . htmlspecialchars($usuario['foto']); ?>" alt="Foto"
-                            class="perfil-img">
+                        <img src="<?php echo $directorio_raiz . 'uploads/' . htmlspecialchars($usuario['foto']); ?>"
+                            alt="Foto" class="perfil-img">
                     <?php else: ?>
-                        <div class="perfil-avatar-placeholder">👤</div>
+                        <div class="perfil-avatar-placeholder">Perfil</div>
                     <?php endif; ?>
                 </div>
                 <div>
                     <label class="perfil-label">Actualizar Fotografía</label>
                     <input type="file" name="foto_perfil" accept="image/png, image/jpeg, image/jpg, image/webp">
-                    <small style="color: #64748b; display: block; margin-top: 4px;">Formatos: JPG, PNG, WEBP.</small>
+                    <small class="perfil-small-text">Formatos: JPG, PNG, WEBP.</small>
                 </div>
             </div>
 
@@ -311,7 +181,7 @@ $base_url = "http://localhost/FerreteriaElConstructor/";
 
             <hr class="perfil-divider">
 
-            <h3 class="perfil-section-title">🔒 Seguridad (Cambiar Contraseña)</h3>
+            <h3 class="perfil-section-title">Seguridad (Cambiar Contraseña)</h3>
             <p class="perfil-subtitle">Déjalo en blanco si no deseas modificar tu contraseña.</p>
 
             <div class="perfil-form-group">
@@ -330,7 +200,7 @@ $base_url = "http://localhost/FerreteriaElConstructor/";
                 </div>
             </div>
 
-            <button type="submit" class="perfil-btn-submit">💾 Guardar Cambios</button>
+            <button type="submit" class="perfil-btn-submit">Guardar Cambios</button>
         </form>
     </div>
 </div>

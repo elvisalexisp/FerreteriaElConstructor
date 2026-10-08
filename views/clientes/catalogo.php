@@ -1,394 +1,603 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-?>
-
-<?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$isLoggedIn = isset($_SESSION['usuario']) || isset($_SESSION['nombre']) || isset($_SESSION['correo']) || isset($_SESSION['id_usuario']);
-
-$id_usuario = 0;
-if ($isLoggedIn) {
-    $id_usuario = $_SESSION['usuario']['id_usuario'] ?? $_SESSION['id_usuario'] ?? $_SESSION['usuario'] ?? 1;
-    if (is_array($id_usuario)) {
-        $id_usuario = $id_usuario['id_usuario'] ?? 1;
-    }
-}
-
-$isLocal = (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1'));
-
-if ($isLocal) {
-    $base_url = "http://localhost/FerreteriaElConstructor/";
-} else {
-    $base_url = "https://ferreteriaelconstructor.gt.tc/";
-}
-
-require_once __DIR__ . '/../../models/Database.php';
 require_once __DIR__ . '/../../models/Producto.php';
-require_once __DIR__ . '/../../models/wishlist.php';
 require_once __DIR__ . '/../../models/Categoria.php';
+require_once __DIR__ . '/../../models/wishlist.php';
+require_once __DIR__ . '/../../models/Carrito.php';
 
-$mensaje_toast = '';
+$productoModel = new Producto();
+$categoriaModel = new Categoria();
 
-$busqueda = trim($_GET['q'] ?? '');
+$categorias = $categoriaModel->obtenerTodas();
+
+$busqueda = trim($_GET['busqueda'] ?? '');
 $id_categoria = intval($_GET['categoria'] ?? 0);
-$orden = $_GET['orden'] ?? 'recientes';
+$orden_precio = trim($_GET['orden'] ?? '');
+$solo_stock = isset($_GET['solo_stock']) ? true : false;
 
-if (isset($_POST['accion']) && $_POST['accion'] === 'agregar') {
-    if (!$isLoggedIn) {
-        $mensaje_toast = "Debes crear una cuenta o iniciar sesión para agregar productos al carrito.";
-    } else {
-        $id_producto_cart = intval($_POST['id_producto'] ?? 0);
-        $nombre = $_POST['nombre'] ?? 'Producto';
-        $precio = floatval($_POST['precio'] ?? 0);
-        $cantidad_agregar = max(1, intval($_POST['cantidad'] ?? 1));
+// Capturar el ID del producto a resaltar proveniente de la wishlist
+$highlight_id = isset($_GET['highlight']) ? intval($_GET['highlight']) : 0;
 
-        if (!isset($_SESSION['carrito'])) {
-            $_SESSION['carrito'] = [];
-        }
+// Calcular precios mínimos y máximos globales reales de la base de datos
+$todosLosProds = $productoModel->obtenerTodos();
+$precioGlobalMin = 0;
+$precioGlobalMax = 1000;
 
-        if (isset($_SESSION['carrito'][$id_producto_cart])) {
-            $_SESSION['carrito'][$id_producto_cart]['cantidad'] += $cantidad_agregar;
-        } else {
-            $_SESSION['carrito'][$id_producto_cart] = [
-                'nombre' => $nombre,
-                'precio' => $precio,
-                'cantidad' => $cantidad_agregar
-            ];
-        }
-
-        $mensaje_toast = "¡$cantidad_agregar x '$nombre' agregado(s) al carrito exitosamente!";
+if (!empty($todosLosProds)) {
+    $precios = array_column($todosLosProds, 'precio');
+    $precioGlobalMin = floor(min($precios));
+    $precioGlobalMax = ceil(max($precios));
+    if ($precioGlobalMin == $precioGlobalMax) {
+        $precioGlobalMax = $precioGlobalMin + 100;
     }
 }
 
-if (isset($_POST['accion']) && $_POST['accion'] === 'wishlist') {
-    if (!$isLoggedIn) {
-        $mensaje_toast = "Debes crear una cuenta o iniciar sesión para agregar productos a tu lista de deseos.";
-    } else {
-        $id_prod_wish = intval($_POST['id_producto'] ?? 0);
-        $nombre_prod = $_POST['nombre'] ?? 'Producto';
-
-        $favoritos_actuales = Wishlist::obtenerPorUsuario($id_usuario);
-        $ids_actuales = array_column($favoritos_actuales, 'id_producto');
-
-        if (in_array($id_prod_wish, $ids_actuales)) {
-            Wishlist::eliminar($id_usuario, $id_prod_wish);
-            $mensaje_toast = "¡'$nombre_prod' ha sido eliminado de tu lista de deseos!";
-        } else {
-            Wishlist::agregar($id_usuario, $id_prod_wish);
-            $mensaje_toast = "¡'$nombre_prod' ha sido agregado a tu lista de deseos exitosamente!";
-        }
-    }
-}
-
-$categorias = Categoria::obtenerTodas();
-$pdo = Database::conectar();
-
-$sql = "SELECT p.*, c.nombre AS nombre_categoria 
-        FROM productos p 
-        LEFT JOIN categorias c ON p.id_categoria = c.id_categoria 
-        WHERE 1=1";
-$params = [];
+$precio_min = isset($_GET['precio_min']) && $_GET['precio_min'] !== '' ? floatval($_GET['precio_min']) : $precioGlobalMin;
+$precio_max = isset($_GET['precio_max']) && $_GET['precio_max'] !== '' ? floatval($_GET['precio_max']) : $precioGlobalMax;
 
 if (!empty($busqueda)) {
-    $sql .= " AND (p.nombre LIKE ? OR p.descripcion LIKE ?)";
-    $params[] = "%$busqueda%";
-    $params[] = "%$busqueda%";
-}
-
-if ($id_categoria > 0) {
-    $sql .= " AND p.id_categoria = ?";
-    $params[] = $id_categoria;
-}
-
-if ($orden === 'precio_asc') {
-    $sql .= " ORDER BY p.precio ASC";
-} elseif ($orden === 'precio_desc') {
-    $sql .= " ORDER BY p.precio DESC";
+    $productos = $productoModel->buscar($busqueda);
+} elseif ($id_categoria > 0) {
+    $productos = $productoModel->obtenerPorCategoria($id_categoria);
 } else {
-    $sql .= " ORDER BY p.id_producto DESC";
+    $productos = $todosLosProds;
 }
 
-$stmt = $pdo->prepare($sql);
-$stmt->execute($params);
-$productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$ids_favoritos = [];
-if ($isLoggedIn) {
-    $favoritos_usuario = Wishlist::obtenerPorUsuario($id_usuario);
-    $ids_favoritos = array_column($favoritos_usuario, 'id_producto');
+// Filtrar por precio y stock
+if (!empty($productos)) {
+    $productos = array_filter($productos, function ($p) use ($precio_min, $precio_max, $solo_stock) {
+        if (floatval($p['precio']) < $precio_min || floatval($p['precio']) > $precio_max) {
+            return false;
+        }
+        if ($solo_stock && intval($p['cantidad']) <= 0) {
+            return false;
+        }
+        return true;
+    });
 }
 
-include __DIR__ . '/../layouts/header_cliente.php';
+// Ordenar por precio si se solicita
+if (!empty($productos)) {
+    usort($productos, function ($a, $b) use ($orden_precio) {
+        if ($orden_precio === 'asc') {
+            return floatval($a['precio']) <=> floatval($b['precio']);
+        } elseif ($orden_precio === 'desc') {
+            return floatval($b['precio']) <=> floatval($a['precio']);
+        }
+        return 0;
+    });
+}
+
+$wishlistIds = [];
+if (isset($_SESSION['id_usuario'])) {
+    $wishlistModel = new Wishlist();
+    $itemsWish = $wishlistModel->obtenerPorUsuario($_SESSION['id_usuario']);
+    foreach ($itemsWish as $w) {
+        $wishlistIds[] = $w['id_producto'];
+    }
+}
 ?>
 
-<link rel="stylesheet" href="<?php echo $base_url; ?>assets/css/catalogo.css">
+<!DOCTYPE html>
+<html lang="es">
 
-<div class="catalogo-container">
-    <div class="catalogo-header">
-        <div>
-            <h2>🧱 Catálogo de Productos y Materiales</h2>
-            <p>Explora nuestro inventario de construcción, herramientas y acabados profesionales.</p>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Productos - Ferretería El Constructor</title>
+    <link rel="stylesheet" href="<?php echo $directorio_raiz; ?>assets/css/catalogo.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+</head>
+
+<body>
+
+    <?php include_once __DIR__ . '/../layouts/header_cliente.php'; ?>
+
+    <main class="catalogo-main">
+        <div id="toast-container" class="toast-container"></div>
+
+        <div class="catalogo-layout-principal">
+            <aside class="sidebar-filtros">
+                <h3><i class="fas fa-filter"></i> Filtrar Productos</h3>
+
+                <!-- Formulario de Búsqueda y Filtros unificados -->
+                <form action="index.php" method="GET">
+                    <input type="hidden" name="vista" value="catalogo">
+
+                    <!-- Campo de búsqueda que retiene el valor -->
+                    <div class="filtro-grupo">
+                        <label for="busqueda">Buscar Producto</label>
+                        <div style="display: flex; gap: 6px;">
+                            <input type="text" name="busqueda" id="busqueda"
+                                value="<?php echo htmlspecialchars($busqueda); ?>" placeholder="Ej. Taladro, Cemento..."
+                                style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;">
+                            <button type="submit"
+                                style="background: #f59e0b; border: none; padding: 0 12px; border-radius: 4px; cursor: pointer; color: #000;">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="filtro-grupo">
+                        <label for="categoria">Categoría</label>
+                        <select name="categoria" id="categoria">
+                            <option value="0">Todas las categorías</option>
+                            <?php foreach ($categorias as $cat): ?>
+                                <option value="<?php echo $cat['id_categoria']; ?>" <?php echo $id_categoria == $cat['id_categoria'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($cat['nombre']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <!-- Ordenar por precio -->
+                    <div class="filtro-grupo">
+                        <label for="orden">Ordenar Precio</label>
+                        <select name="orden" id="orden">
+                            <option value="">Por defecto</option>
+                            <option value="asc" <?php echo $orden_precio === 'asc' ? 'selected' : ''; ?>>Menor a Mayor
+                                Precio</option>
+                            <option value="desc" <?php echo $orden_precio === 'desc' ? 'selected' : ''; ?>>Mayor a Menor
+                                Precio</option>
+                        </select>
+                    </div>
+
+                    <!-- Filtro adicional: Solo en stock -->
+                    <div class="filtro-grupo checkbox-grupo">
+                        <label>
+                            <input type="checkbox" name="solo_stock" value="1" <?php echo $solo_stock ? 'checked' : ''; ?>>
+                            Solo productos disponibles
+                        </label>
+                    </div>
+
+                    <!-- Filtro por Rango de Precio con Slider Interactivo -->
+                    <div class="filtro-grupo">
+                        <label>Rango de Precio (Q)</label>
+                        <div
+                            style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px;">
+                            <span id="label-precio-min">Q <?php echo number_format($precio_min, 2); ?></span>
+                            <span id="label-precio-max">Q <?php echo number_format($precio_max, 2); ?></span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <input type="range" id="slider-precio-min" min="<?php echo $precioGlobalMin; ?>"
+                                max="<?php echo $precioGlobalMax; ?>" step="1" value="<?php echo $precio_min; ?>"
+                                oninput="actualizarSliderPrecio()">
+                            <input type="range" id="slider-precio-max" min="<?php echo $precioGlobalMin; ?>"
+                                max="<?php echo $precioGlobalMax; ?>" step="1" value="<?php echo $precio_max; ?>"
+                                oninput="actualizarSliderPrecio()">
+                        </div>
+                        <input type="hidden" name="precio_min" id="input-precio-min" value="<?php echo $precio_min; ?>">
+                        <input type="hidden" name="precio_max" id="input-precio-max" value="<?php echo $precio_max; ?>">
+                    </div>
+
+                    <button type="submit" class="btn-aplicar-filtros">Aplicar Filtros</button>
+                    <a href="index.php?vista=catalogo" class="btn-limpiar-filtros">Limpiar todos los filtros</a>
+                </form>
+            </aside>
+
+            <section class="catalogo-grid-container">
+
+                <!-- Alerta visual si hay una búsqueda activa con opción de limpiar -->
+                <?php if (!empty($busqueda)): ?>
+                    <div class="busqueda-activa-banner">
+                        <span><i class="fas fa-search"></i> Resultados de búsqueda para:
+                            <strong>"<?php echo htmlspecialchars($busqueda); ?>"</strong></span>
+                        <a href="index.php?vista=catalogo" class="btn-limpiar-busqueda"><i class="fas fa-times"></i> Limpiar
+                            búsqueda</a>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (empty($productos)): ?>
+                    <div class="estado-vacio">
+                        <i class="fas fa-box-open"></i>
+                        <h3>No se encontraron productos</h3>
+                        <p>Intenta con otra búsqueda o ajusta los filtros seleccionados.</p>
+                        <a href="index.php?vista=catalogo" class="btn-primario">Ver todo el catálogo</a>
+                    </div>
+                <?php else: ?>
+                    <div class="grid-productos">
+                        <?php foreach ($productos as $p):
+                            $enWishlist = in_array($p['id_producto'], $wishlistIds);
+                            $productoJson = htmlspecialchars(json_encode($p), ENT_QUOTES, 'UTF-8');
+                            $imagenSrc = !empty($p['imagen']) ? $directorio_raiz . 'assets/img/productos/' . htmlspecialchars($p['imagen']) : $directorio_raiz . 'assets/img/productos/default.png';
+
+                            $esResaltado = ($highlight_id === intval($p['id_producto']));
+                            $claseResaltado = $esResaltado ? ' highlight-product' : '';
+                            ?>
+                            <div class="card-producto<?php echo $claseResaltado; ?>"
+                                id="producto-<?php echo $p['id_producto']; ?>" data-id="<?php echo $p['id_producto']; ?>">
+                                <div class="card-header-acciones">
+                                    <button type="button" class="btn-wishlist-toggle <?php echo $enWishlist ? 'activo' : ''; ?>"
+                                        onclick="toggleWishlist(<?php echo $p['id_producto']; ?>, this)"
+                                        title="Agregar a Lista de Deseos">
+                                        <i class="fas fa-heart"></i>
+                                    </button>
+                                </div>
+
+                                <div class="card-imagen">
+                                    <img src="<?php echo $imagenSrc; ?>" alt="<?php echo htmlspecialchars($p['nombre']); ?>">
+                                </div>
+
+                                <div class="card-cuerpo">
+                                    <span class="producto-stock <?php echo $p['cantidad'] > 0 ? 'en-stock' : 'agotado'; ?>">
+                                        <?php echo $p['cantidad'] > 0 ? 'Disponibles: ' . $p['cantidad'] : 'Agotado'; ?>
+                                    </span>
+                                    <h3>
+                                        <?php echo htmlspecialchars($p['nombre']); ?>
+                                    </h3>
+                                    <p class="precio">Q
+                                        <?php echo number_format($p['precio'], 2); ?>
+                                    </p>
+                                    <p class="descripcion-corta">
+                                        <?php echo htmlspecialchars(substr($p['descripcion'], 0, 70)); ?>...
+                                    </p>
+                                </div>
+
+                                <div class="card-footer-acciones">
+                                    <button type="button" class="btn-secundario"
+                                        onclick='abrirDetalleModal(<?php echo $productoJson; ?>)'>
+                                        <i class="fas fa-eye"></i> Ver
+                                    </button>
+                                    <button type="button" class="btn-primario"
+                                        onclick="agregarAlCarrito(<?php echo $p['id_producto']; ?>, 1, this)" <?php echo $p['cantidad'] <= 0 ? 'disabled' : ''; ?>>
+                                        <i class="fas fa-shopping-cart"></i> Comprar
+                                    </button>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </section>
         </div>
-        <a href="carrito.php" class="btn-ver-carrito">
-            🛒 Ver Carrito
-            <span class="badge-carrito">
-                <?php echo isset($_SESSION['carrito']) ? array_sum(array_column($_SESSION['carrito'], 'cantidad')) : 0; ?>
-            </span>
-        </a>
+    </main>
+
+    <!-- Modales de detalle e imagen -->
+    <div id="modal-detalle" class="modal-overlay" style="display: none;">
+        <div class="modal-contenido">
+            <button type="button" class="modal-cerrar" onclick="cerrarDetalleModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-grid">
+                <div class="modal-imagen-container" onclick="abrirImagenCompleta()"
+                    title="Haz clic para ver la imagen en grande">
+                    <img id="modal-img" src="" alt="Imagen Ampliada">
+                    <span class="zoom-hint"><i class="fas fa-search-plus"></i> Clic para ampliar</span>
+                </div>
+                <div class="modal-info">
+                    <h2 id="modal-nombre"></h2>
+                    <p id="modal-precio" class="modal-precio"></p>
+                    <p id="modal-descripcion" class="modal-descripcion"></p>
+                    <div class="modal-stock-info">
+                        <strong>Estado de Inventario: </strong> <span id="modal-stock"></span>
+                    </div>
+                    <div class="modal-cantidad-grupo">
+                        <label for="cantidad-input">Cantidad:</label>
+                        <input type="number" id="cantidad-input" value="1" min="1" max="100">
+                    </div>
+                    <div class="modal-acciones">
+                        <button type="button" id="modal-btn-carrito" class="btn-primario">
+                            <i class="fas fa-shopping-cart"></i> Agregar al Carrito
+                        </button>
+                        <button type="button" id="modal-btn-wishlist" class="btn-secundario">
+                            <i class="fas fa-heart"></i> <span id="modal-wishlist-text">Wishlist</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <form action="catalogo.php" method="GET" class="filtros-form">
-        <div class="input-busqueda-wrapper">
-            <input type="text" name="q" placeholder="Buscar herramientas, cemento, tubos..."
-                value="<?php echo htmlspecialchars($busqueda); ?>" class="input-busqueda">
-        </div>
-
-        <div class="selects-wrapper">
-            <select name="categoria" class="select-filtro">
-                <option value="0">📂 Todas las Categorías</option>
-                <?php foreach ($categorias as $cat): ?>
-                    <option value="<?php echo $cat['id_categoria']; ?>" <?php echo ($id_categoria == $cat['id_categoria']) ? 'selected' : ''; ?>>
-                        <?php echo htmlspecialchars($cat['nombre']); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-
-            <select name="orden" class="select-filtro">
-                <option value="recientes" <?php echo ($orden === 'recientes') ? 'selected' : ''; ?>>🕒 Más Recientes
-                </option>
-                <option value="precio_asc" <?php echo ($orden === 'precio_asc') ? 'selected' : ''; ?>>💵 Precio: Menor a
-                    Mayor</option>
-                <option value="precio_desc" <?php echo ($orden === 'precio_desc') ? 'selected' : ''; ?>>💰 Precio: Mayor
-                    a Menor</option>
-            </select>
-
-            <button type="submit" class="btn-filtrar">🔍 Filtrar</button>
-            <?php if (!empty($busqueda) || $id_categoria > 0 || $orden !== 'recientes'): ?>
-                <a href="catalogo.php" class="btn-limpiar" title="Limpiar filtros">❌ Limpiar</a>
-            <?php endif; ?>
-        </div>
-    </form>
-
-    <?php if (!empty($mensaje_toast)): ?>
-        <?php
-        $es_error = strpos($mensaje_toast, 'Debes crear') !== false || strpos($mensaje_toast, '⚠️') !== false;
-        ?>
-        <div style="background: <?php echo $es_error ? '#fee2e2' : '#dcfce7'; ?>; 
-                    color: <?php echo $es_error ? '#991b1b' : '#166534'; ?>; 
-                    padding: 14px 20px; 
-                    border-radius: 8px; 
-                    margin-bottom: 20px; 
-                    text-align: center; 
-                    font-weight: 500; 
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 10px;
-                    border: 1px solid <?php echo $es_error ? '#fca5a5' : '#86efac'; ?>;">
-            <span style="font-size: 1.2rem;">
-                <?php echo $es_error ? '⚠️' : '✅'; ?>
-            </span>
-            <span>
-                <?php echo htmlspecialchars(str_replace(['⚠️ ', '✅ '], '', $mensaje_toast)); ?>
-            </span>
-        </div>
-    <?php endif; ?>
-
-    <?php if (empty($productos)): ?>
-        <div class="catalogo-vacio">
-            <div class="catalogo-vacio-icon">🔍</div>
-            <p class="catalogo-vacio-text">No se encontraron productos con los criterios seleccionados.</p>
-            <a href="catalogo.php" class="catalogo-vacio-link">Ver todos los productos</a>
-        </div>
-    <?php else: ?>
-        <div class="catalogo-grid">
-            <?php foreach ($productos as $prod): ?>
-                <?php
-                $es_favorito = in_array($prod['id_producto'], $ids_favoritos);
-                $imagen_url = !empty($prod['imagen']) ? $base_url . 'assets/img/productos/' . htmlspecialchars($prod['imagen']) : '';
-                ?>
-                <div class="card-producto">
-                    <form action="catalogo.php?<?php echo htmlspecialchars($_SERVER['QUERY_STRING']); ?>" method="POST"
-                        style="display:inline;">
-                        <input type="hidden" name="accion" value="wishlist">
-                        <input type="hidden" name="id_producto" value="<?php echo $prod['id_producto']; ?>">
-                        <input type="hidden" name="nombre" value="<?php echo htmlspecialchars($prod['nombre']); ?>">
-                        <button type="submit" class="btn-wishlist <?php echo $es_favorito ? 'favorito-activo' : ''; ?>"
-                            title="Agregar a Lista de Deseos">
-                            <?php echo $es_favorito ? '❤️' : '🤍'; ?>
-                        </button>
-                    </form>
-
-                    <div>
-                        <div class="card-img-box">
-                            <?php if (!empty($prod['imagen'])): ?>
-                                <img src="<?php echo $imagen_url; ?>" alt="<?php echo htmlspecialchars($prod['nombre']); ?>">
-                            <?php else: ?>
-                                <span class="card-icon-placeholder">🛠️</span>
-                            <?php endif; ?>
-                        </div>
-
-                        <span class="card-badge-categoria">
-                            <?php echo htmlspecialchars($prod['nombre_categoria'] ?? 'General'); ?>
-                        </span>
-
-                        <h3 class="card-title">
-                            <?php echo htmlspecialchars($prod['nombre']); ?>
-                        </h3>
-                        <p class="card-desc">
-                            <?php echo htmlspecialchars(substr($prod['descripcion'] ?? 'Sin descripción disponible.', 0, 75)); ?>...
-                        </p>
-                    </div>
-
-                    <div>
-                        <div class="card-footer-info">
-                            <span class="card-precio">Q
-                                <?php echo number_format($prod['precio'], 2); ?>
-                            </span>
-                            <span class="card-stock">Stock:
-                                <?php echo $prod['cantidad'] ?? 'Disponible'; ?>
-                            </span>
-                        </div>
-
-                        <!-- Formulario para agregar al carrito -->
-                        <form action="catalogo.php" method="POST" class="form-agregar">
-                            <input type="hidden" name="accion" value="agregar">
-                            <input type="hidden" name="id_producto" value="<?php echo $prod['id_producto']; ?>">
-                            <input type="hidden" name="nombre" value="<?php echo htmlspecialchars($prod['nombre']); ?>">
-                            <input type="hidden" name="precio" value="<?php echo $prod['precio']; ?>">
-
-                            <input type="number" name="cantidad" value="1" min="1"
-                                max="<?php echo max(1, $prod['cantidad'] ?? 10); ?>" class="input-cantidad">
-                            <button type="submit" class="btn-add-cart">➕ Añadir</button>
-                        </form>
-
-                        <!-- Botón Ver Detalles  -->
-                        <button type="button" onclick="abrirModal(
-                            '<?php echo addslashes(htmlspecialchars($prod['nombre'])); ?>', 
-                            '<?php echo addslashes(htmlspecialchars($prod['descripcion'] ?? 'Sin descripción detallada.')); ?>', 
-                            '<?php echo number_format($prod['precio'], 2); ?>', 
-                            '<?php echo $prod['cantidad'] ?? 'Disponible'; ?>',
-                            '<?php echo $imagen_url; ?>',
-                            '<?php echo addslashes(htmlspecialchars($prod['nombre_categoria'] ?? 'General')); ?>'
-                        )" class="btn-detalles">
-                            🔍 Ver más detalles
-                        </button>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
-</div>
-
-<!-- Modal de Detalles del Producto -->
-<div id="modalDetalle" class="modal-overlay">
-    <div class="modal-container">
-        <button type="button" onclick="cerrarModal()" class="modal-close-btn">✕</button>
-
-        <div class="modal-grid-layout" style="display: grid; grid-template-columns: 1fr 1.2fr; min-height: 380px;">
-            <!-- Contenedor de la Imagen del Producto -->
-            <div class="modal-img-container"
-                style="background: #f8fafc; display: flex; align-items: center; justify-content: center; padding: 30px; border-right: 1px solid #f1f5f9; position: relative;">
-                <img id="modalImagen" src="" alt="Imagen del producto"
-                    style="display: none; max-width: 100%; max-height: 250px; object-fit: contain; border-radius: 8px;">
-                <span id="modalPlaceholderIcon" class="modal-placeholder-icon"
-                    style="display: none; font-size: 4rem;">🛠️</span>
-            </div>
-
-            <!-- Contenedor de Información -->
-            <div class="modal-info-container"
-                style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between;">
-                <div>
-                    <span id="modalCategoria" class="modal-badge-cat"
-                        style="display: inline-block; background: #e0f2fe; color: #0369a1; font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">Categoría</span>
-                    <h3 id="modalTitulo" class="modal-title-modern"
-                        style="font-size: 1.35rem; font-weight: 700; color: #1e293b; margin: 0 0 12px 0; line-height: 1.3;">
-                    </h3>
-
-                    <div class="modal-price-stock-row"
-                        style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                        <span id="modalPrecio" class="modal-price-tag"
-                            style="font-size: 1.5rem; font-weight: 800; color: #0d9488;"></span>
-                        <span id="modalStock" class="modal-stock-badge"
-                            style="background: #f0fdf4; color: #15803d; font-size: 0.85rem; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid #dcfce7;"></span>
-                    </div>
-
-                    <div class="modal-divider-line" style="height: 1px; background: #e2e8f0; margin: 15px 0;"></div>
-
-                    <h4 class="modal-desc-heading"
-                        style="font-size: 0.9rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin: 0 0 6px 0; letter-spacing: 0.5px;">
-                        Descripción del Producto</h4>
-                    <p id="modalDescripcion" class="modal-desc-content"
-                        style="font-size: 0.95rem; color: #475569; line-height: 1.6; margin: 0 0 20px 0; max-height: 110px; overflow-y: auto;">
-                    </p>
-                </div>
-
-                <div class="modal-footer-actions">
-                    <button type="button" onclick="cerrarModal()" class="modal-btn-cerrar-modern"
-                        style="background: #334155; color: #ffffff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s; width: 100%; text-align: center;">Cerrar</button>
-                </div>
+    <div id="modal-imagen-fullscreen" class="modal-overlay" style="display: none;" onclick="cerrarImagenCompleta()">
+        <div class="modal-contenido">
+            <button type="button" class="modal-cerrar" onclick="cerrarImagenCompleta()">
+                <i class="fas fa-times"></i>
+            </button>
+            <div style="display: flex; justify-content: center; align-items: center; padding: 20px;">
+                <img id="img-fullscreen-src" src="" alt="Imagen a tamaño completo"
+                    style="max-width: 100%; max-height: 75vh; object-fit: contain;">
             </div>
         </div>
     </div>
-</div>
 
-<!-- Scripts de Interacción del Modal Corregidos -->
-<script>
-    function abrirModal(nombre,descripcion,precio,stock,imagenUrl,categoria) {
-        document.getElementById('modalTitulo').innerText=nombre;
-        document.getElementById('modalPrecio').innerText='Q '+precio;
-        document.getElementById('modalStock').innerText='Stock: '+stock;
-        document.getElementById('modalDescripcion').innerText=descripcion;
-        document.getElementById('modalCategoria').innerText=categoria;
+    <?php include_once __DIR__ . '/../layouts/footer.php'; ?>
 
-        const imgElement=document.getElementById('modalImagen');
-        const iconElement=document.getElementById('modalPlaceholderIcon');
+    <script>
+        const DIRECTORIO_RAIZ = "<?php echo $directorio_raiz; ?>";
+        let urlImagenActual = "";
 
-        if(imagenUrl&&imagenUrl.trim()!=='') {
-            imgElement.src=imagenUrl;
-            imgElement.style.display='block';
-            iconElement.style.display='none';
-        } else {
-            imgElement.style.display='none';
-            iconElement.style.display='block';
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            obtenerContadorInicial();
 
-        // Activamos la clase que muestra el modal según el CSS general
-        const modalOverlay=document.getElementById('modalDetalle');
-        modalOverlay.classList.add('active');
-    }
-
-    function cerrarModal() {
-        const modalOverlay=document.getElementById('modalDetalle');
-        modalOverlay.classList.remove('active');
-    }
-
-    // Permitir cerrar haciendo clic fuera de la tarjeta del modal (en el overlay oscuro)
-    document.addEventListener('DOMContentLoaded',() => {
-        const modalOverlay=document.getElementById('modalDetalle');
-        if(modalOverlay) {
-            modalOverlay.addEventListener('click',(event) => {
-                if(event.target===modalOverlay) {
-                    cerrarModal();
+            const urlParams = new URLSearchParams(window.location.search);
+            const highlightId = urlParams.get('highlight');
+            if (highlightId) {
+                const tarjeta = document.getElementById('producto-' + highlightId);
+                if (tarjeta) {
+                    tarjeta.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setTimeout(() => {
+                        tarjeta.classList.remove('highlight-product');
+                        const nuevaUrl = window.location.pathname + window.location.search.replace(/&?highlight=\d+/, '').replace(/^\?&/, '?');
+                        window.history.replaceState({}, document.title, nuevaUrl);
+                    }, 4000);
                 }
+            }
+        });
+
+        function obtenerContadorInicial() {
+            fetch(DIRECTORIO_RAIZ + 'api/carrito.php', { method: 'GET' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.status === 'success' && data.data && typeof data.data.cantidad_total !== 'undefined') {
+                        actualizarTodosLosContadores(data.data.cantidad_total);
+                    }
+                })
+                .catch(() => { });
+        }
+
+        function actualizarSliderPrecio() {
+            let sliderMin = document.getElementById('slider-precio-min');
+            let sliderMax = document.getElementById('slider-precio-max');
+            let valMin = parseFloat(sliderMin.value);
+            let valMax = parseFloat(sliderMax.value);
+
+            if (valMin > valMax) {
+                let temp = valMin;
+                sliderMin.value = valMax;
+                sliderMax.value = temp;
+                valMin = parseFloat(sliderMin.value);
+                valMax = parseFloat(sliderMax.value);
+            }
+
+            document.getElementById('label-precio-min').innerText = 'Q ' + valMin.toFixed(2);
+            document.getElementById('label-precio-max').innerText = 'Q ' + valMax.toFixed(2);
+            document.getElementById('input-precio-min').value = valMin;
+            document.getElementById('input-precio-max').value = valMax;
+        }
+
+        function mostrarToast(mensaje, tipo = 'exito') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast-notificacion ${tipo}`;
+            toast.innerHTML = `<i class="fas ${tipo === 'exito' ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i><span>${mensaje}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+        function toggleWishlist(idProducto, btnElement = null) {
+            fetch(DIRECTORIO_RAIZ + 'api/wish.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `id_producto=${idProducto}`
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const cardBtn = document.querySelector(`.card-producto[data-id="${idProducto}"] .btn-wishlist-toggle`);
+                        const modalBtn = document.getElementById('modal-btn-wishlist');
+
+                        let estaActivo = false;
+                        if (cardBtn) {
+                            cardBtn.classList.toggle('activo');
+                            estaActivo = cardBtn.classList.contains('activo');
+                        }
+
+                        if (modalBtn && modalBtn.getAttribute('data-id') == idProducto) {
+                            modalBtn.classList.toggle('activo', estaActivo);
+                            const textSpan = document.getElementById('modal-wishlist-text');
+                            if (textSpan) {
+                                textSpan.innerText = estaActivo ? 'En Wishlist' : 'Wishlist';
+                            }
+                        }
+
+                        mostrarToast(estaActivo ? 'Producto añadido a la lista de deseos' : 'Producto removido de la lista de deseos', 'exito');
+                    } else {
+                        mostrarToast(data.error || 'Inicia sesión para usar la lista de deseos', 'advertencia');
+                    }
+                })
+                .catch(() => mostrarToast('Error de conexión con el servidor', 'advertencia'));
+        }
+
+        function agregarAlCarrito(idProducto, cantidad = 1, btnElement = null) {
+            fetch(DIRECTORIO_RAIZ + 'api/carrito.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `id_producto=${idProducto}&cantidad=${cantidad}`
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        if (btnElement) {
+                            animarVueloAlCarrito(btnElement);
+                            transformarBotonIrAlPago(btnElement);
+                        }
+
+                        const totalItems = data.data && typeof data.data.cantidad_total !== 'undefined' ? data.data.cantidad_total : 0;
+                        actualizarTodosLosContadores(totalItems);
+
+                        mostrarToast('¡Producto agregado al carrito con éxito!', 'exito');
+                    } else {
+                        mostrarToast(data.error || 'No se pudo agregar al carrito', 'advertencia');
+                    }
+                })
+                .catch(() => mostrarToast('Error al procesar el carrito', 'advertencia'));
+        }
+
+        function transformarBotonIrAlPago(btn) {
+            btn.innerHTML = `<i class="fas fa-arrow-right"></i> Ir al pago`;
+            btn.className = 'btn-ir-pago';
+            btn.onclick = function () {
+                window.location.href = DIRECTORIO_RAIZ + 'index.php?vista=carrito';
+            };
+        }
+
+        function animarVueloAlCarrito(btn) {
+            const card = btn.closest('.card-producto');
+            const imgCard = card ? card.querySelector('.card-imagen img') : document.getElementById('modal-img');
+            const carritoIconoNav = document.querySelector('.fa-shopping-cart, .icono-carrito, [href*="vista=carrito"]');
+
+            if (!imgCard) return;
+
+            let destinoRect;
+            let usarBotonFlotante = false;
+
+            if (carritoIconoNav) {
+                const rectNav = carritoIconoNav.getBoundingClientRect();
+                if (rectNav.top < 0 || rectNav.bottom > window.innerHeight) {
+                    usarBotonFlotante = true;
+                } else {
+                    destinoRect = rectNav;
+                }
+            } else {
+                usarBotonFlotante = true;
+            }
+
+            let elementoDestino;
+            if (usarBotonFlotante) {
+                elementoDestino = obtenerOCrearCarritoFlotante();
+                destinoRect = elementoDestino.getBoundingClientRect();
+            }
+
+            const rectImg = imgCard.getBoundingClientRect();
+
+            const flyer = document.createElement('img');
+            flyer.src = imgCard.src;
+            flyer.className = 'flyer-carrito';
+            flyer.style.top = `${rectImg.top}px`;
+            flyer.style.left = `${rectImg.left}px`;
+            flyer.style.width = `${rectImg.width}px`;
+            flyer.style.height = `${rectImg.height}px`;
+            document.body.appendChild(flyer);
+
+            setTimeout(() => {
+                flyer.style.top = `${destinoRect.top}px`;
+                flyer.style.left = `${destinoRect.left}px`;
+                flyer.style.width = '30px';
+                flyer.style.height = '30px';
+                flyer.style.opacity = '0.4';
+            }, 10);
+
+            setTimeout(() => {
+                flyer.remove();
+                if (carritoIconoNav && !usarBotonFlotante) {
+                    carritoIconoNav.classList.add('fa-bounce');
+                    setTimeout(() => carritoIconoNav.classList.remove('fa-bounce'), 800);
+                }
+            }, 800);
+        }
+
+        function obtenerOCrearCarritoFlotante() {
+            let flotante = document.getElementById('carrito-flotante-derecha');
+            if (!flotante) {
+                flotante = document.createElement('div');
+                flotante.id = 'carrito-flotante-derecha';
+                flotante.innerHTML = `<a href="${DIRECTORIO_RAIZ}index.php?vista=carrito" title="Ir al carrito"><i class="fas fa-shopping-cart"></i><span id="contador-flotante" class="badge-flotante">0</span></a>`;
+                document.body.appendChild(flotante);
+            }
+            return flotante;
+        }
+
+        function actualizarTodosLosContadores(total) {
+            const totalNum = parseInt(total) || 0;
+
+            const contadoresHeader = document.querySelectorAll('#cart-count, .contador-carrito, #contador-carrito, .fa-shopping-cart + span');
+            contadoresHeader.forEach(el => {
+                el.innerText = totalNum;
+                el.style.display = totalNum > 0 ? 'inline-block' : 'none';
             });
-        }
-    });
 
-    // Cerrar también presionando la tecla ESC
-    document.addEventListener('keydown',(event) => {
-        if(event.key==='Escape') {
-            cerrarModal();
+            const flotante = obtenerOCrearCarritoFlotante();
+            const contadorFlotante = flotante.querySelector('#contador-flotante');
+            if (contadorFlotante) {
+                contadorFlotante.innerText = totalNum;
+                contadorFlotante.style.display = totalNum > 0 ? 'inline-block' : 'none';
+            }
         }
-    });
-</script>
 
-<?php
-include __DIR__ . '/../layouts/footer.php';
-?>
+        window.addEventListener('scroll', () => {
+            const carritoIconoNav = document.querySelector('.fa-shopping-cart, .icono-carrito, [href*="vista=carrito"]');
+            const flotante = obtenerOCrearCarritoFlotante();
+
+            if (carritoIconoNav) {
+                const rectNav = carritoIconoNav.getBoundingClientRect();
+                if (rectNav.bottom < 0) {
+                    flotante.style.display = 'flex';
+                } else {
+                    flotante.style.display = 'none';
+                }
+            } else {
+                if (window.scrollY > 150) {
+                    flotante.style.display = 'flex';
+                } else {
+                    flotante.style.display = 'none';
+                }
+            }
+        });
+
+        function abrirDetalleModal(producto) {
+            document.getElementById('modal-nombre').innerText = producto.nombre;
+            document.getElementById('modal-precio').innerText = `Q ${parseFloat(producto.precio).toFixed(2)}`;
+            document.getElementById('modal-descripcion').innerText = producto.descripcion;
+
+            const imgPath = producto.imagen ? producto.imagen : 'default.png';
+            urlImagenActual = DIRECTORIO_RAIZ + 'assets/img/productos/' + imgPath;
+            document.getElementById('modal-img').src = urlImagenActual;
+
+            const stockSpan = document.getElementById('modal-stock');
+            stockSpan.innerText = producto.cantidad > 0 ? `${producto.cantidad} unidades disponibles` : 'Agotado';
+            stockSpan.className = producto.cantidad > 0 ? 'texto-en-stock' : 'texto-agotado';
+
+            document.getElementById('modal-btn-carrito').onclick = function () {
+                const cant = parseInt(document.getElementById('cantidad-input').value) || 1;
+                agregarAlCarrito(producto.id_producto, cant, this);
+                cerrarDetalleModal();
+            };
+
+            const modalBtnWishlist = document.getElementById('modal-btn-wishlist');
+            modalBtnWishlist.setAttribute('data-id', producto.id_producto);
+
+            const cardBtn = document.querySelector(`.card-producto[data-id="${producto.id_producto}"] .btn-wishlist-toggle`);
+            const enWish = cardBtn ? cardBtn.classList.contains('activo') : false;
+
+            modalBtnWishlist.classList.toggle('activo', enWish);
+            const textSpan = document.getElementById('modal-wishlist-text');
+            if (textSpan) {
+                textSpan.innerText = enWish ? 'En Wishlist' : 'Wishlist';
+            }
+
+            modalBtnWishlist.onclick = function () {
+                toggleWishlist(producto.id_producto);
+            };
+
+            document.getElementById('modal-detalle').style.display = 'flex';
+        }
+
+        function cerrarDetalleModal() {
+            document.getElementById('modal-detalle').style.display = 'none';
+        }
+
+        function abrirImagenCompleta() {
+            if (urlImagenActual) {
+                document.getElementById('img-fullscreen-src').src = urlImagenActual;
+                document.getElementById('modal-imagen-fullscreen').style.display = 'flex';
+            }
+        }
+
+        function cerrarImagenCompleta() {
+            document.getElementById('modal-imagen-fullscreen').style.display = 'none';
+        }
+
+        window.onclick = function (event) {
+            if (event.target === document.getElementById('modal-detalle')) cerrarDetalleModal();
+            if (event.target === document.getElementById('modal-imagen-fullscreen')) cerrarImagenCompleta();
+        }
+    </script>
+</body>
+
+</html>

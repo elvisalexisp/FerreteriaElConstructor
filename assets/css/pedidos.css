@@ -1,0 +1,277 @@
+/* =================================================================
+   ESTILOS PREMIUM PARA PEDIDOS - FERRETERÍA EL CONSTRUCTOR
+   ================================================================ */
+
+:root {
+    --primary-color: #0f172a;
+    --accent-color: #f59e0b;
+    /* Amarillo ferretero */
+    --accent-hover: #d97706;
+    --bg-main: #f8fafc;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.04);
+    --shadow-md: 0 10px 25px -3px rgba(15, 23, 42, 0.08);
+    --radius-default: 0.75rem;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    margin: 0;
+}
+
+/* =================================================================
+   1. CONTENEDOR Y CABECERA PRINCIPAL
+   ================================================================ */
+.pedidos-cliente-container {
+    max-width: 1000px;
+    margin: 2.5rem auto 4rem auto;
+    padding: 0 1.5rem;
+}
+
+.pedidos-header {
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.pedidos-header h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin: 0 0 0.4rem 0;
+}
+
+.pedidos-header p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* =================================================================
+   2. ALERTAS Y ESTADOS VACÍOS
+   ================================================================ */
+.alert-success {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #15803d;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-default);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.sin-pedidos {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-default);
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.sin-pedidos p {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    margin: 0 0 1.5rem 0;
+}
+
+.sin-pedidos .btn-primary {
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
+    color: var(--primary-color);
+    text-decoration: none;
+    padding: 0.75rem 1.75rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: inline-block;
+    transition: filter 0.2s, transform 0.1s;
+}
+
+.sin-pedidos .btn-primary:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+}
+
+/* =================================================================
+   3. TARJETAS DE PEDIDOS
+   ================================================================ */
+.lista-pedidos {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.card-pedido {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-default);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+}
+
+.card-pedido:hover {
+    box-shadow: var(--shadow-md);
+    border-color: #cbd5e1;
+}
+
+/* Barra de Información del Pedido (ID, Fecha y Estado) */
+.pedido-info-bar {
+    background-color: #f8fafc;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.pedido-id {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin-right: 1rem;
+}
+
+.pedido-fecha {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.badge-estado {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+    padding: 0.35rem 0.85rem;
+    border-radius: 2rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Cuerpo del Pedido (Dirección, Facturación, Total) */
+.pedido-body {
+    padding: 1.5rem;
+}
+
+.pedido-detalles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    background-color: #fafafa;
+    border: 1px solid var(--border-color);
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+.pedido-detalles-grid p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.pedido-detalles-grid strong {
+    color: var(--primary-color);
+}
+
+.pedido-total-monto {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--primary-color);
+}
+
+/* Tabla interna de productos */
+.productos-titulo {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0 0 0.75rem 0;
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.tabla-productos-pedido {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+.tabla-productos-pedido th {
+    background-color: #f1f5f9;
+    color: var(--primary-color);
+    font-weight: 700;
+    padding: 0.75rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.tabla-productos-pedido td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+
+.tabla-productos-pedido tr:last-child td {
+    border-bottom: none;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+/* Pie de la tarjeta de pedido */
+.pedido-footer-info {
+    background-color: #0f172a;
+    color: #ffffff;
+    padding: 0.85rem 1.5rem;
+    font-size: 0.825rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.pedido-footer-info strong {
+    color: var(--accent-color);
+}
+
+/* =================================================================
+   4. RESPONSIVIDAD (MÓVILES)
+   ================================================================ */
+@media (max-width: 768px) {
+    .pedidos-cliente-container {
+        padding: 0 1rem;
+    }
+
+    .pedido-info-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .pedido-footer-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .pedido-detalles-grid {
+        grid-template-columns: 1fr;
+    }
+}

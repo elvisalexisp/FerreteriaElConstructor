@@ -1,66 +1,77 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
+/**
+ * Controlador Pedido - Ferretería El Constructor
+ */
 require_once __DIR__ . '/../models/Pedido.php';
-require_once __DIR__ . '/../models/Producto.php';
+require_once __DIR__ . '/../models/Carrito.php';
 
 class PedidoController
 {
-    public static function procesarCheckout()
+
+    public function procesarCheckout()
     {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
         if (!isset($_SESSION['usuario'])) {
-            header("Location: ../login.php");
+            header('Location: index.php?vista=login');
             exit();
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['carrito'])) {
-            $usuario_sesion = $_SESSION['usuario'];
-            $id_usuario = is_array($usuario_sesion) ? ($usuario_sesion['id_usuario'] ?? $usuario_sesion['id'] ?? 1) : $usuario_sesion;
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $direccion = $_POST['direccion_envio'] ?? '';
+            $nit = $_POST['nit'] ?? 'CF';
+            $nombreFactura = $_POST['nombre_factura'] ?? 'Consumidor Final';
+            $id_usuario = $_SESSION['usuario']['id_usuario'];
 
-            // Recoger datos del formulario
-            $dir_input = trim($_POST['direccion_envio'] ?? 'Cobán');
-            $nit = trim($_POST['nit'] ?? 'C/F');
-            $nombre_factura = trim($_POST['nombre_factura'] ?? 'Consumidor Final');
+            $carritoObj = new Carrito();
+            $contenido = $carritoObj->obtenerContenido();
+            $items = $contenido['items'];
+            $total = $contenido['total'];
 
-            $direccion_envio = "Dir: " . $dir_input . " | NIT: " . $nit . " | Factura a: " . $nombre_factura;
-
-            $total = 0;
-            $carritoItems = [];
-
-            foreach ($_SESSION['carrito'] as $id_producto => $item) {
-                $subtotal = $item['precio'] * $item['cantidad'];
-                $total += $subtotal;
-
-                $carritoItems[] = [
-                    'id_producto' => $id_producto,
-                    'cantidad' => $item['cantidad'],
-                    'precio' => $item['precio']
-                ];
+            if (empty($items)) {
+                header('Location: index.php?vista=carrito');
+                exit();
             }
 
-            // Crear el pedido en la base de datos
-            $id_pedido = Pedido::crearPedido($id_usuario, $total, $direccion_envio, $carritoItems);
+            $pedidoModel = new Pedido();
+            $id_pedido = $pedidoModel->crear($id_usuario, $total, $items, $direccion, $nit, $nombreFactura);
 
             if ($id_pedido) {
-                unset($_SESSION['carrito']);
-                header("Location: ../views/clientes/pedidos.php?exito=1");
+                $carritoObj->vaciar();
+                header('Location: index.php?vista=pedidos&exito=1');
                 exit();
             } else {
-                header("Location: ../views/clientes/carrito.php?error=transaccion");
+                header('Location: index.php?vista=carrito&error=1');
                 exit();
             }
-        } else {
-            header("Location: ../views/clientes/carrito.php");
+        }
+    }
+
+    public function cambiarEstado()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id_pedido = $_POST['id_pedido'] ?? null;
+            $estado = $_POST['estado'] ?? null;
+
+            if ($id_pedido && $estado) {
+                $pedidoModel = new Pedido();
+                $pedidoModel->actualizarEstado($id_pedido, $estado);
+            }
+            header('Location: index.php?vista=admin_consultas');
             exit();
         }
     }
-}
 
-$accion = $_POST['accion'] ?? $_GET['accion'] ?? '';
-
-if ($accion === 'checkout') {
-    PedidoController::procesarCheckout();
+    public function eliminar()
+    {
+        $id_pedido = $_GET['id'] ?? null;
+        if ($id_pedido) {
+            $pedidoModel = new Pedido();
+            $pedidoModel->eliminar($id_pedido);
+        }
+        header('Location: index.php?vista=admin_consultas');
+        exit();
+    }
 }
-?>

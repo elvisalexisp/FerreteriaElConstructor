@@ -3,102 +3,128 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if (!isset($_SESSION['usuario'])) {
-    header("Location: ../login.php");
+if (!isset($_SESSION['id_usuario'])) {
+    header('Location: index.php?vista=login');
     exit();
 }
 
-$isLocal = (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1'));
-
-if ($isLocal) {
-    $base_url = "http://localhost/FerreteriaElConstructor/";
-} else {
-    $base_url = "https://ferreteriaelconstructor.gt.tc/";
-}
-
 require_once __DIR__ . '/../../models/Pedido.php';
+$pedidoModel = new Pedido();
+$misPedidos = $pedidoModel->obtenerPorCliente($_SESSION['id_usuario']);
 
-$usuario_sesion = $_SESSION['usuario'];
-$id_usuario = is_array($usuario_sesion) ? ($usuario_sesion['id_usuario'] ?? $usuario_sesion['id'] ?? 1) : $usuario_sesion;
-
-$pedidos = Pedido::obtenerPorUsuario($id_usuario);
-
-include __DIR__ . '/../layouts/header_cliente.php';
+include_once __DIR__ . '/../layouts/header_cliente.php';
 ?>
 
-<div class="main-content-container" style="padding: 25px; max-width: 1000px; margin: 0 auto;">
-    <h2 style="color: #1e293b; margin-bottom: 20px;">📦 Mis Pedidos Realizados</h2>
+<!-- Hoja de estilos personalizada -->
+<link rel="stylesheet" href="<?php echo $directorio_raiz; ?>assets/css/pedidos.css">
+
+<div class="pedidos-cliente-container">
+    <div class="pedidos-header">
+        <h2>Mis Pedidos Realizados</h2>
+        <p>Consulta el detalle de tus compras, el estado de entrega y comprobantes de la ferretería.</p>
+    </div>
 
     <?php if (isset($_GET['exito']) && $_GET['exito'] == 1): ?>
-        <div
-            style="background: #dcfce7; color: #16a34a; padding: 15px; border-radius: 6px; margin-bottom: 20px; text-align: center; font-weight: 500;">
-            ✅ ¡Pedido realizado con éxito! Puedes consultar en la pestaña pedidos.
+        <div class="alert-success">
+            ¡<strong>Pedido Recibido con éxito!</strong> Tu requerimiento ha sido registrado en nuestro sistema. Pronto nos
+            pondremos en contacto para el despacho en Cobán.
         </div>
     <?php endif; ?>
 
-    <?php if (empty($pedidos)): ?>
-        <div class="card"
-            style="padding: 40px; text-align: center; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-            <p style="font-size: 1.2rem; color: #64748b; margin-bottom: 20px;">Aún no has realizado ningún pedido.</p>
-            <a href="index.php" class="btn"
-                style="padding: 10px 20px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px; font-weight: 500;">Ir
-                al Catálogo</a>
+    <?php if (empty($misPedidos)): ?>
+        <div class="sin-pedidos">
+            <p>Aún no has registrado ningún pedido en el sistema.</p>
+            <a href="<?php echo $directorio_raiz; ?>index.php?vista=catalogo" class="btn-primary">Ir al Catálogo</a>
         </div>
     <?php else: ?>
-        <div class="card"
-            style="background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-            <table style="width: 100%; border-collapse: collapse; text-align: left;">
-                <thead>
-                    <tr style="border-bottom: 2px solid #e2e8f0; color: #64748b;">
-                        <th style="padding: 12px;">N° Pedido</th>
-                        <th style="padding: 12px;">Fecha</th>
-                        <th style="padding: 12px;">Dirección y Facturación</th>
-                        <th style="padding: 12px;">Total</th>
-                        <th style="padding: 12px; text-align: center;">Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($pedidos as $pedido): ?>
-                        <tr style="border-bottom: 1px solid #f1f5f9;">
-                            <td style="padding: 12px; font-weight: bold; color: #2563eb;">
-                                #<?php echo $pedido['id_pedido'] ?? $pedido['id'] ?? 'N/D'; ?>
-                            </td>
-                            <td style="padding: 12px; color: #475569;">
-                                <?php echo $pedido['fecha']; ?>
-                            </td>
-                            <td style="padding: 12px; color: #475569; font-size: 0.9rem;">
-                                <?php echo htmlspecialchars($pedido['direccion_envio']); ?>
-                            </td>
-                            <td style="padding: 12px; font-weight: bold; color: #0f172a;">
-                                Q <?php echo number_format($pedido['total'], 2); ?>
-                            </td>
-                            <td style="padding: 12px; text-align: center;">
-                                <?php
-                                $estado = $pedido['estado'] ?? 'Pendiente';
-                                $bgColor = '#fef3c7';
-                                $textColor = '#d97706';
+        <div class="lista-pedidos">
+            <?php foreach ($misPedidos as $pedido): ?>
+                <div class="card-pedido">
 
-                                if (strtolower($estado) === 'completado' || strtolower($estado) === 'entregado') {
-                                    $bgColor = '#dcfce7';
-                                    $textColor = '#16a34a';
-                                } elseif (strtolower($estado) === 'cancelado') {
-                                    $bgColor = '#fee2e2';
-                                    $textColor = '#dc2626';
-                                }
-                                ?>
-                                <span
-                                    style="background: <?php echo $bgColor; ?>; color: <?php echo $textColor; ?>; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold;">
-                                    <?php echo ucfirst($estado); ?>
-                                </span>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                    <!-- Cabecera del Pedido -->
+                    <div class="pedido-info-bar">
+                        <div>
+                            <span class="pedido-id">Pedido # <?php echo $pedido['id_pedido']; ?></span>
+                            <span class="pedido-fecha">Fecha: <?php echo $pedido['fecha']; ?></span>
+                        </div>
+                        <div>
+                            <span class="badge-estado">
+                                Estado: <?php echo htmlspecialchars($pedido['estado']); ?>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Datos Generales y Facturación -->
+                    <div class="pedido-body">
+                        <div class="pedido-detalles-grid">
+                            <div>
+                                <p><strong>Dirección de Envío:</strong><br>
+                                    <?php echo htmlspecialchars($pedido['direccion_envio']); ?>
+                                </p>
+                            </div>
+                            <div>
+                                <p><strong>Datos de Facturación:</strong><br>
+                                    NIT: <?php echo htmlspecialchars($pedido['nit']); ?><br>
+                                    Nombre: <?php echo htmlspecialchars($pedido['nombre_factura']); ?>
+                                </p>
+                            </div>
+                            <div>
+                                <p><strong>Total a Pagar:</strong><br>
+                                    <span class="pedido-total-monto">Q <?php echo number_format($pedido['total'], 2); ?></span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Detalle de Productos Comprados (Tabla interna) -->
+                        <h4 class="productos-titulo">Productos en este Pedido:</h4>
+                        <div class="table-responsive">
+                            <table class="tabla-productos-pedido">
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th class="text-center">Cantidad</th>
+                                        <th class="text-right">Precio Unitario</th>
+                                        <th class="text-right">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (!empty($pedido['detalles'])): ?>
+                                        <?php foreach ($pedido['detalles'] as $detalle): ?>
+                                            <tr>
+                                                <td>
+                                                    <?php echo htmlspecialchars($detalle['producto_nombre']); ?>
+                                                </td>
+                                                <td class="text-center">
+                                                    <?php echo $detalle['cantidad']; ?>
+                                                </td>
+                                                <td class="text-right">Q <?php echo number_format($detalle['precio'], 2); ?></td>
+                                                <td class="text-right">Q
+                                                    <?php echo number_format($detalle['cantidad'] * $detalle['precio'], 2); ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="4" class="text-center">No hay detalles registrados para este pedido.</td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Pie con Información institucional de la Ferretería -->
+                    <div class="pedido-footer-info">
+                        <span>📍 <strong>Ferretería El Constructor</strong> - Cobán, Alta Verapaz</span>
+                        <span>📞 Soporte / Consultas de Entrega: Atendiendo su solicitud de materiales</span>
+                    </div>
+
+                </div>
+            <?php endforeach; ?>
         </div>
     <?php endif; ?>
 </div>
 
 <?php
-include __DIR__ . '/../layouts/footer.php';
+include_once __DIR__ . '/../layouts/footer.php';
 ?>

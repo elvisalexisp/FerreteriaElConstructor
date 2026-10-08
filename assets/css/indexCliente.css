@@ -1,0 +1,492 @@
+/**
+ * ==========================================================================
+ * ESTILOS ANIMADOS & AISLADOS - FERRETERÍA EL CONSTRUCTOR (INDEX CLIENTES)
+ * Prefijo único: .ferre-home-wrapper (Protege Header y Footer externos)
+ * ==========================================================================
+ */
+
+.ferre-home-wrapper {
+    max-width: 1210px;
+    margin: 0 auto;
+    padding: 20px 15px;
+    font-family: inherit;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+.ferre-home-wrapper *,
+.ferre-home-wrapper *::before,
+.ferre-home-wrapper *::after {
+    box-sizing: border-box;
+}
+
+/* --- SISTEMA DE ANIMACIONES FLUIDAS --- */
+@keyframes ferreFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes ferreSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes ferrePulseGlow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(245, 158, 11, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+    }
+}
+
+.ferre-fade-in {
+    animation: ferreFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.ferre-slide-up {
+    animation: ferreSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* --- SECCIÓN 1: HERO & GRID PRINCIPAL --- */
+.ferre-hero-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.ferre-main-banner {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: #ffffff;
+    padding: 35px;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.ferre-main-banner:hover {
+    transform: translateY(-2px);
+}
+
+.ferre-banner-badge {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+    width: fit-content;
+    margin-bottom: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    animation: ferrePulseGlow 3s infinite;
+}
+
+.ferre-main-banner h1 {
+    font-size: 1.85rem;
+    margin: 0 0 12px 0;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+.ferre-main-banner p {
+    font-size: 0.95rem;
+    color: #cbd5e1;
+    margin: 0 0 22px 0;
+    line-height: 1.5;
+}
+
+.ferre-banner-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.ferre-btn-primary {
+    background: #f59e0b;
+    color: #0f172a;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 0.88rem;
+    transition: all 0.25s ease;
+    display: inline-block;
+}
+
+.ferre-btn-primary:hover {
+    background: #d97706;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+.ferre-btn-outline {
+    background: transparent;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.88rem;
+    transition: all 0.25s ease;
+}
+
+.ferre-btn-outline:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+/* Tarjetas Laterales con Efecto Flotante */
+.ferre-side-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.ferre-info-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    padding: 20px;
+    border-radius: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ferre-info-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+    border-color: #cbd5e1;
+}
+
+.ferre-card-icon {
+    background: #eff6ff;
+    color: #2563eb;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.ferre-info-card:hover .ferre-card-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.ferre-info-card h3 {
+    font-size: 0.95rem;
+    color: #1e293b;
+    margin: 0 0 4px 0;
+    font-weight: 700;
+}
+
+.ferre-info-card p {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* --- SECCIÓN 2: BARRA DE ESTADÍSTICAS --- */
+.ferre-stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    padding: 18px 22px;
+    border-radius: 14px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.ferre-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: transform 0.2s ease;
+}
+
+.ferre-stat-item:hover {
+    transform: scale(1.02);
+}
+
+.ferre-stat-item i {
+    font-size: 1.8rem;
+    color: #f59e0b;
+}
+
+.ferre-stat-item strong {
+    display: block;
+    font-size: 0.88rem;
+    color: #1e293b;
+}
+
+.ferre-stat-item span {
+    font-size: 0.78rem;
+    color: #64748b;
+}
+
+/* --- SECCIÓN 3: CONTENEDORES Y CATEGORÍAS ANIMADAS --- */
+.ferre-section-container {
+    margin-bottom: 35px;
+}
+
+.ferre-section-title {
+    font-size: 1.35rem;
+    color: #1e293b;
+    margin: 0 0 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+}
+
+.ferre-section-subtitle {
+    font-size: 0.88rem;
+    color: #64748b;
+    margin: 0 0 18px 0;
+}
+
+.ferre-categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+}
+
+.ferre-category-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    padding: 24px 18px;
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ferre-hover-scale:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.1);
+    border-color: #f59e0b;
+}
+
+.ferre-category-icon {
+    font-size: 1.8rem;
+    color: #f59e0b;
+    margin-bottom: 12px;
+    transition: transform 0.3s ease;
+}
+
+.ferre-category-item:hover .ferre-category-icon {
+    transform: scale(1.15);
+}
+
+.ferre-category-item h4 {
+    font-size: 0.95rem;
+    color: #1e293b;
+    margin: 0 0 6px 0;
+    font-weight: 700;
+}
+
+.ferre-category-item p {
+    font-size: 0.78rem;
+    color: #64748b;
+    margin: 0;
+}
+
+/* --- SECCIÓN 4: HISTORIA, MISIÓN Y VISIÓN --- */
+.ferre-corporate-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.ferre-corp-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 25px;
+    border-radius: 14px;
+    transition: all 0.3s ease;
+}
+
+.ferre-corp-box:hover {
+    background: #ffffff;
+    border-color: #2563eb;
+    box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.08);
+    transform: translateY(-4px);
+}
+
+.ferre-corp-icon {
+    color: #2563eb;
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+}
+
+.ferre-corp-box h3 {
+    font-size: 1.05rem;
+    color: #1e293b;
+    margin: 0 0 10px 0;
+    font-weight: 700;
+}
+
+.ferre-corp-box p {
+    font-size: 0.82rem;
+    color: #475569;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* --- SECCIÓN 5: UBICACIÓN CON MAPA INTERACTIVO (IFRAME) --- */
+.ferre-location-card {
+    background: linear-gradient(135deg, #ffffff, #f8fafc);
+    border: 1px solid #cbd5e1;
+    padding: 25px;
+    border-radius: 16px;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 25px;
+    align-items: center;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.03);
+}
+
+.ferre-location-content h2 {
+    font-size: 1.25rem;
+    color: #1e293b;
+    margin: 0 0 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+}
+
+.ferre-location-content p {
+    font-size: 0.88rem;
+    color: #475569;
+    margin: 0 0 15px 0;
+    line-height: 1.5;
+}
+
+.ferre-location-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ferre-location-list li {
+    font-size: 0.82rem;
+    color: #334155;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ferre-location-list li i {
+    color: #16a34a;
+    font-size: 0.9rem;
+}
+
+.ferre-map-container {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: 2px solid #e2e8f0;
+    transition: transform 0.3s ease;
+}
+
+.ferre-map-container:hover {
+    transform: scale(1.01);
+}
+
+/* --- SECCIÓN 6: BANNER DE REGISTRO INVITADOS --- */
+.ferre-auth-banner {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border: 1px solid #bfdbfe;
+    padding: 25px 30px;
+    border-radius: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.05);
+}
+
+.ferre-auth-text h3 {
+    font-size: 1.05rem;
+    color: #1e3a8a;
+    margin: 0 0 4px 0;
+    font-weight: 700;
+}
+
+.ferre-auth-text p {
+    font-size: 0.82rem;
+    color: #1e40af;
+    margin: 0;
+}
+
+.ferre-btn-light {
+    background: #2563eb;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    font-weight: 700;
+    display: inline-block;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.ferre-btn-light:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+}
+
+/* --- RESPONSIVE DESIGN --- */
+@media(max-width: 768px) {
+    .ferre-hero-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ferre-location-card {
+        grid-template-columns: 1fr;
+    }
+
+    .ferre-auth-banner {
+        flex-direction: column;
+        text-align: center;
+    }
+}
