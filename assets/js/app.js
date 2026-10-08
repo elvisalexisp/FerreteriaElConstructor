@@ -7,11 +7,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnCategorias = document.getElementById("btnCategoriasToggle");
 
   if (btnCategorias) {
-    // Crear contenedor flotante de categorías si no existe
     let dropdownMenu = document.createElement("div");
     dropdownMenu.className = "categorias-dropdown-menu-flotante";
 
-    // Lista de tus categorías oficiales de la base de datos
     const categorias = [
       { id: 1, nombre: "Herramientas Eléctricas", icono: "fa-bolt" },
       { id: 2, nombre: "Materiales de Construcción", icono: "fa-cubes" },
@@ -22,7 +20,6 @@ document.addEventListener("DOMContentLoaded", () => {
       { id: 7, nombre: "Ferretería General", icono: "fa-tools" },
     ];
 
-    // Construir los enlaces internos del menú usando clases CSS
     let contenidoHTML = `<ul class="dropdown-lista-categorias">`;
     contenidoHTML += `<li><a href="index.php?vista=catalogo" class="dropdown-item-cat"><i class="fas fa-th-large"></i> Ver Todas</a></li>`;
 
@@ -39,50 +36,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
     dropdownMenu.innerHTML = contenidoHTML;
 
-    // Asegurarse de que el contenedor padre sea relativo para posicionar el menú
     const contenedorPadre = btnCategorias.parentElement;
     if (contenedorPadre) {
       contenedorPadre.classList.add("dropdown-contenedor-padre");
       contenedorPadre.appendChild(dropdownMenu);
     }
 
-    // Efecto Click para mostrar u ocultar
     btnCategorias.addEventListener("click", (e) => {
       e.stopPropagation();
       dropdownMenu.classList.toggle("show");
     });
 
-    // Cerrar el menú si se hace clic fuera de él
     document.addEventListener("click", () => {
       dropdownMenu.classList.remove("show");
     });
 
-    // Evitar que al hacer clic dentro del menú este se cierre
     dropdownMenu.addEventListener("click", (e) => {
       e.stopPropagation();
     });
   }
 
-  // 2. Función genérica para actualizar el contador del carrito (Badge)
-  window.actualizarContadorCarrito = function (cantidad) {
-    const cartBadge = document.getElementById("cart-count");
-    if (cartBadge) {
-      cartBadge.textContent = cantidad;
-    }
-  };
-
-  // 2.1 Función para procesar y actualizar el contador usando la respuesta de la API
-  window.procesarRespuestaCarrito = function (data) {
-    if (data.status === "success" && data.data && data.data.items) {
-      let totalItems = 0;
-      Object.values(data.data.items).forEach((item) => {
-        totalItems += parseInt(item.cantidad || 0);
-      });
-      window.actualizarContadorCarrito(totalItems);
-    }
-  };
-
-  // 3. Control de Carrusel
+  // 2. Control de Carrusel
   const carruselSlides = document.querySelectorAll(".carrusel-slide");
   if (carruselSlides.length > 0) {
     let indiceActual = 0;
@@ -93,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 5000);
   }
 
-  // 4. Auto-cierre de alertas de éxito o error después de 4 segundos
+  // 3. Auto-cierre de alertas de éxito o error después de 4 segundos
   const alertas = document.querySelectorAll(".alert-success, .alert-error");
   if (alertas.length > 0) {
     setTimeout(() => {
@@ -105,10 +79,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 4000);
   }
 
-  // 5. Smart Header: Ocultar en scroll hacia abajo SOLO en el catálogo
+  // 4. Smart Header: Ocultar en scroll hacia abajo SOLO en el catálogo
   let lastScrollTop = 0;
   const header = document.querySelector(".cliente-header");
-
   const esCatalogo =
     window.location.search.includes("vista=catalogo") ||
     window.location.pathname.includes("catalogo");
@@ -131,12 +104,11 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  // 7. Control para contraer/expandir el Sidebar del Panel Admin
+  // 5. Control para contraer/expandir el Sidebar del Panel Admin (Escritorio)
   const btnToggleSidebar = document.getElementById("sidebarToggle");
   const adminWrapper = document.querySelector(".admin-wrapper");
 
   if (btnToggleSidebar && adminWrapper) {
-    // Recuperar el estado previo guardado en localStorage
     const sidebarState = localStorage.getItem("admin_sidebar_collapsed");
     if (sidebarState === "true") {
       adminWrapper.classList.add("sidebar-collapsed");
@@ -148,9 +120,64 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("admin_sidebar_collapsed", isCollapsed);
     });
   }
+
+  // 6. Control del Menú Móvil para el Panel Admin (Hamburguesa y Overlay)
+  const mobileToggle = document.getElementById("mobileSidebarToggle");
+  const overlay = document.getElementById("sidebarOverlay");
+
+  function toggleMobileMenu() {
+    if (adminWrapper) {
+      adminWrapper.classList.toggle("sidebar-active");
+    }
+  }
+
+  function closeMobileMenu() {
+    if (adminWrapper) {
+      adminWrapper.classList.remove("sidebar-active");
+    }
+  }
+
+  if (mobileToggle) {
+    mobileToggle.addEventListener("click", toggleMobileMenu);
+  }
+
+  if (overlay) {
+    overlay.addEventListener("click", closeMobileMenu);
+  }
+
+  // Cerrar el menú automáticamente al hacer clic en cualquier opción en móviles
+  const menuLinks = document.querySelectorAll(".sidebar-menu a");
+  menuLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      if (window.innerWidth <= 992) {
+        closeMobileMenu();
+      }
+    });
+  });
 });
 
-// 6. Sincronizar el contador del carrito al cargar la página
+// ==========================================
+// FUNCIONES GLOBALES Y FETCH DEL CARRITO
+// ==========================================
+
+window.actualizarContadorCarrito = function (cantidad) {
+  const cartBadge = document.getElementById("cart-count");
+  if (cartBadge) {
+    cartBadge.textContent = cantidad;
+  }
+};
+
+window.procesarRespuestaCarrito = function (data) {
+  if (data.status === "success" && data.data && data.data.items) {
+    let totalItems = 0;
+    Object.values(data.data.items).forEach((item) => {
+      totalItems += parseInt(item.cantidad || 0);
+    });
+    window.actualizarContadorCarrito(totalItems);
+  }
+};
+
+// Sincronizar el contador del carrito al cargar la página
 fetch("api/carrito.php")
   .then((response) => {
     if (response.ok) return response.json();
@@ -162,7 +189,7 @@ fetch("api/carrito.php")
       Object.values(data.data.items).forEach((item) => {
         totalItems += parseInt(item.cantidad || 0);
       });
-      actualizarContadorCarrito(totalItems);
+      window.actualizarContadorCarrito(totalItems);
     }
   })
   .catch((error) => {

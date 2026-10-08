@@ -3,9 +3,14 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 $sesionIniciada = isset($_SESSION['id_usuario']);
+
+// Definir directorio raíz por defecto si no ha sido declarado previamente
+if (!isset($directorio_raiz)) {
+    $directorio_raiz = "/FerreteriaElConstructor1.0/";
+}
 ?>
 
-<link rel="stylesheet" href="/FerreteriaElConstructor1.0/assets/css/footer.css">
+<link rel="stylesheet" href="<?php echo $directorio_raiz; ?>assets/css/footer.css">
 
 <footer class="footer-container">
     <div class="footer-content">
@@ -25,20 +30,20 @@ $sesionIniciada = isset($_SESSION['id_usuario']);
         <div class="footer-section">
             <h4>Enlaces Rápidos</h4>
             <ul>
-                <li><a href="/FerreteriaElConstructor1.0/index.php?vista=catalogo"><i class="fas fa-angle-right"></i>
+                <li><a href="<?php echo $directorio_raiz; ?>index.php?vista=catalogo"><i class="fas fa-angle-right"></i>
                         Catálogo de Productos</a></li>
-                <li><a href="/FerreteriaElConstructor1.0/index.php?vista=resenas"><i class="fas fa-angle-right"></i>
+                <li><a href="<?php echo $directorio_raiz; ?>index.php?vista=resenas"><i class="fas fa-angle-right"></i>
                         Reseñas y Opiniones</a></li>
 
                 <?php if ($sesionIniciada): ?>
-                    <li><a href="/FerreteriaElConstructor1.0/index.php?vista=perfil"><i class="fas fa-angle-right"></i> Mi
-                            Perfil</a></li>
-                    <li><a href="/FerreteriaElConstructor1.0/index.php?vista=carrito"><i class="fas fa-angle-right"></i> Mi
-                            Carrito</a></li>
+                    <li><a href="<?php echo $directorio_raiz; ?>index.php?vista=perfil"><i class="fas fa-angle-right"></i>
+                            Mi Perfil</a></li>
+                    <li><a href="<?php echo $directorio_raiz; ?>index.php?vista=carrito"><i class="fas fa-angle-right"></i>
+                            Mi Carrito</a></li>
                 <?php else: ?>
-                    <li><a href="/FerreteriaElConstructor1.0/index.php?vista=login"><i class="fas fa-angle-right"></i>
+                    <li><a href="<?php echo $directorio_raiz; ?>index.php?vista=login"><i class="fas fa-angle-right"></i>
                             Iniciar Sesión</a></li>
-                    <li><a href="/FerreteriaElConstructor1.0/index.php?vista=registro"><i class="fas fa-angle-right"></i>
+                    <li><a href="<?php echo $directorio_raiz; ?>index.php?vista=registro"><i class="fas fa-angle-right"></i>
                             Crear Cuenta</a></li>
                 <?php endif; ?>
             </ul>
@@ -55,11 +60,10 @@ $sesionIniciada = isset($_SESSION['id_usuario']);
     </div>
 
     <div class="footer-bottom">
-        <p>&copy;
-            <?php echo date('Y'); ?> Ferretería El Constructor 1.0. Todos los derechos reservados.
-        </p>
+        <p>&copy; <?php echo date('Y'); ?> Ferretería El Constructor 1.0. Todos los derechos reservados.</p>
     </div>
 </footer>
+
 <?php
 // Incluir la barra flotante de administración si el usuario logueado es admin
 include_once __DIR__ . '/admin_flotante.php';

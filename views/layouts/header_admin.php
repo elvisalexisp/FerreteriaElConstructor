@@ -27,6 +27,9 @@ if (!isset($_SESSION['tipo_usuario']) || !in_array($_SESSION['tipo_usuario'], ['
 
 <body class="admin-body">
     <div class="admin-wrapper">
+        <!-- Capa oscura de fondo para móviles (Overlay) -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
         <!-- Sidebar de Navegación Admin -->
         <aside class="admin-sidebar" id="adminSidebar">
             <div class="sidebar-brand">
@@ -82,6 +85,12 @@ if (!isset($_SESSION['tipo_usuario']) || !in_array($_SESSION['tipo_usuario'], ['
         <!-- Contenido Principal Admin -->
         <div class="admin-main-content">
             <header class="admin-topbar">
+                <!-- Botón hamburguesa exclusivo para móviles -->
+                <button type="button" class="mobile-sidebar-toggle" id="mobileSidebarToggle"
+                    aria-label="Abrir menú móvil">
+                    <i class="fas fa-bars"></i>
+                </button>
+
                 <div class="admin-topbar-title">
                     <h3>Bienvenido,
                         <?php echo htmlspecialchars($_SESSION['nombre']); ?>
