@@ -4,7 +4,6 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 $sesionIniciada = isset($_SESSION['id_usuario']);
 
-// Definir directorio raíz por defecto si no ha sido declarado previamente
 if (!isset($directorio_raiz)) {
     $directorio_raiz = "/FerreteriaElConstructor1.0/";
 }
@@ -65,9 +64,5 @@ if (!isset($directorio_raiz)) {
 </footer>
 
 <?php
-// Incluir la barra flotante de administración si el usuario logueado es admin
 include_once __DIR__ . '/admin_flotante.php';
 ?>
-</body>
-
-</html>

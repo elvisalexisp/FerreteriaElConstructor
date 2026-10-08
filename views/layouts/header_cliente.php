@@ -3,8 +3,9 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$es_local = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false || strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false);
-$directorio_raiz = $es_local ? "/FerreteriaElConstructor1.0/" : "/";
+$protocolo = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+$host = $_SERVER['HTTP_HOST'];
+$directorio_raiz = "/FerreteriaElConstructor1.0/";
 
 $vista_actual = isset($_GET['vista']) ? $_GET['vista'] : 'home';
 $es_catalogo_o_home = ($vista_actual === 'catalogo');
@@ -63,9 +64,8 @@ $foto_usuario = $_SESSION['foto'] ?? '';
                     Alta Verapaz</span>
                 <div class="top-bar-links">
                     <?php if ($usuario_logueado): ?>
-                        <span class="user-greeting">Hola, <strong>
-                                <?php echo htmlspecialchars($nombre_usuario); ?>
-                            </strong></span>
+                        <span class="user-greeting">Hola,
+                            <strong><?php echo htmlspecialchars($nombre_usuario); ?></strong></span>
 
                         <a href="<?php echo $directorio_raiz; ?>index.php?vista=perfil"
                             class="top-link <?php echo ($vista_actual == 'perfil') ? 'active' : ''; ?>">
