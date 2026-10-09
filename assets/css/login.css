@@ -1,11 +1,6 @@
-/* =================================================================
-   ESTILOS PREMIUM PARA LOGIN - FERRETERÍA EL CONSTRUCTOR
-   ================================================================ */
-
 :root {
     --primary-color: #0f172a;
     --accent-color: #f59e0b;
-    /* Amarillo ferretero */
     --accent-hover: #d97706;
     --bg-main: #f8fafc;
     --card-bg: #ffffff;
@@ -24,15 +19,11 @@ body {
     margin: 0;
 }
 
-/* =================================================================
-   1. CONTENEDOR PRINCIPAL Y TARJETA
-   ================================================================ */
 .login-main-container {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: calc(100vh - 160px);
-    /* Ajuste para centrar entre header y footer */
     padding: 2rem 1rem;
 }
 
@@ -47,9 +38,6 @@ body {
     box-sizing: border-box;
 }
 
-/* =================================================================
-   2. CABECERA Y ALERTAS
-   ================================================================ */
 .login-header {
     text-align: center;
     margin-bottom: 2rem;
@@ -69,7 +57,6 @@ body {
     line-height: 1.4;
 }
 
-/* Alertas de Error y Éxito */
 .alert-error,
 .alert-success {
     padding: 0.85rem 1rem;
@@ -105,9 +92,6 @@ body {
     font-size: 1rem;
 }
 
-/* =================================================================
-   3. FORMULARIO Y CAMPOS
-   ================================================================ */
 .login-form {
     display: flex;
     flex-direction: column;
@@ -146,7 +130,6 @@ body {
     box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
 }
 
-/* Wrapper para el input de contraseña y botón de mostrar/ocultar */
 .password-input-wrapper {
     position: relative;
     display: flex;
@@ -155,7 +138,6 @@ body {
 
 .password-input-wrapper input {
     padding-right: 2.8rem !important;
-    /* Espacio para el botón de ojito */
 }
 
 .toggle-password {
@@ -177,9 +159,6 @@ body {
     color: var(--primary-color);
 }
 
-/* =================================================================
-   4. ACCIONES ADICIONALES (RECORDAR Y OLVIDÓ CONTRASEÑA)
-   ================================================================ */
 .form-actions-row {
     display: flex;
     justify-content: space-between;
@@ -215,9 +194,6 @@ body {
     text-decoration: underline;
 }
 
-/* =================================================================
-   5. BOTÓN DE ENVÍO
-   ================================================================ */
 .btn-submit {
     background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
     color: var(--primary-color);
@@ -254,9 +230,6 @@ body {
     transform: none;
 }
 
-/* =================================================================
-   6. PIE DE PÁGINA Y INSIGNIA DE SEGURIDAD
-   ================================================================ */
 .login-footer {
     text-align: center;
     margin-top: 2rem;
@@ -298,9 +271,6 @@ body {
     /* Verde seguro */
 }
 
-/* =================================================================
-   7. RESPONSIVIDAD (MÓVILES)
-   ================================================================ */
 @media (max-width: 480px) {
     .login-main-container {
         padding: 1rem;

@@ -1,7 +1,4 @@
 <?php
-/**
- * Controlador Pedido - Ferretería El Constructor
- */
 require_once __DIR__ . '/../models/Pedido.php';
 require_once __DIR__ . '/../models/Carrito.php';
 

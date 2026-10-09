@@ -1,10 +1,3 @@
-/**
- * ==========================================================================
- * ESTILOS ANIMADOS & AISLADOS - FERRETERÍA EL CONSTRUCTOR (INDEX CLIENTES)
- * Prefijo único: .ferre-home-wrapper (Protege Header y Footer externos)
- * ==========================================================================
- */
-
 .ferre-home-wrapper {
     max-width: 1210px;
     margin: 0 auto;
@@ -20,7 +13,6 @@
     box-sizing: border-box;
 }
 
-/* --- SISTEMA DE ANIMACIONES FLUIDAS --- */
 @keyframes ferreFadeIn {
     from {
         opacity: 0;
@@ -67,7 +59,6 @@
     animation: ferreSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* --- SECCIÓN 1: HERO & GRID PRINCIPAL --- */
 .ferre-hero-grid {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -162,7 +153,6 @@
     border-color: rgba(255, 255, 255, 0.6);
 }
 
-/* Tarjetas Laterales con Efecto Flotante */
 .ferre-side-cards {
     display: flex;
     flex-direction: column;
@@ -219,7 +209,6 @@
     line-height: 1.4;
 }
 
-/* --- SECCIÓN 2: BARRA DE ESTADÍSTICAS --- */
 .ferre-stats-bar {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -259,7 +248,6 @@
     color: #64748b;
 }
 
-/* --- SECCIÓN 3: CONTENEDORES Y CATEGORÍAS ANIMADAS --- */
 .ferre-section-container {
     margin-bottom: 35px;
 }
@@ -325,7 +313,6 @@
     margin: 0;
 }
 
-/* --- SECCIÓN 4: HISTORIA, MISIÓN Y VISIÓN --- */
 .ferre-corporate-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -367,7 +354,6 @@
     line-height: 1.6;
 }
 
-/* --- SECCIÓN 5: UBICACIÓN CON MAPA INTERACTIVO (IFRAME) --- */
 .ferre-location-card {
     background: linear-gradient(135deg, #ffffff, #f8fafc);
     border: 1px solid #cbd5e1;
@@ -430,7 +416,6 @@
     transform: scale(1.01);
 }
 
-/* --- SECCIÓN 6: BANNER DE REGISTRO INVITADOS --- */
 .ferre-auth-banner {
     background: linear-gradient(135deg, #eff6ff, #dbeafe);
     border: 1px solid #bfdbfe;
@@ -475,7 +460,6 @@
     box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
 }
 
-/* --- RESPONSIVE DESIGN --- */
 @media(max-width: 768px) {
     .ferre-hero-grid {
         grid-template-columns: 1fr;

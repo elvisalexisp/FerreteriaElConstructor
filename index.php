@@ -1,5 +1,4 @@
 <?php
-// Iniciar sesión para control de usuarios y carrito
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

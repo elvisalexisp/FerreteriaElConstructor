@@ -1,7 +1,4 @@
 <?php
-/**
- * API Categorías - Ferretería El Constructor
- */
 header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../models/Categoria.php';
 
@@ -26,7 +23,6 @@ switch ($method) {
         break;
 
     case 'POST':
-        // Soporte para creación vía JSON/API si se requiere
         $input = json_decode(file_get_contents('php://input'), true);
         $nombre = $input['nombre'] ?? '';
         $descripcion = $input['descripcion'] ?? '';

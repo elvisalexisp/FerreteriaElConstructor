@@ -1,7 +1,4 @@
 <?php
-/**
- * Controlador Producto - Ferretería El Constructor
- */
 require_once __DIR__ . '/../models/Producto.php';
 require_once __DIR__ . '/../models/Categoria.php';
 

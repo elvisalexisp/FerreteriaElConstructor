@@ -1,7 +1,4 @@
 <?php
-/**
- * Controlador Categoria - Ferretería El Constructor
- */
 require_once __DIR__ . '/../models/Categoria.php';
 
 class CategoriaController

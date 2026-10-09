@@ -1,8 +1,4 @@
 <?php
-/**
- * Vista de Inicio (Index de Clientes) - Ferretería El Constructor
- * Versión Animada & Interactiva: Con Iframe de Google Maps, animaciones fluidas y diseño robusto.
- */
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -11,21 +7,16 @@ $isLoggedIn = isset($_SESSION['usuario']) || isset($_SESSION['nombre']) || isset
 
 $page_title = "Ferretería El Constructor | Materiales y Herramientas en Cobán";
 
-// Definir el directorio raíz si no está definido previamente
 $directorio_raiz = $directorio_raiz ?? "http://localhost/FerreteriaElConstructor/";
 
-// Incluimos el header de cliente
 include_once __DIR__ . '/../layouts/header_cliente.php';
 ?>
 
-<!-- Enlace directo a la hoja de estilos externa -->
 <link rel="stylesheet" href="<?php echo $directorio_raiz; ?>assets/css/indexCliente.css">
 
 <div class="ferre-home-wrapper">
 
-    <!-- SECCIÓN 1: Hero Principal (Banner Izquierdo + Información de Atención Derecha) -->
     <section class="ferre-hero-grid">
-        <!-- Banner Principal de Bienvenida -->
         <div class="ferre-main-banner ferre-fade-in">
             <span class="ferre-banner-badge"><i class="fa-solid fa-location-dot"></i> Cobán, Alta Verapaz</span>
             <h1>Todo para tu Construcción al Mejor Precio</h1>
@@ -45,7 +36,6 @@ include_once __DIR__ . '/../layouts/header_cliente.php';
             </div>
         </div>
 
-        <!-- Tarjetas Laterales de Utilidad y Horarios -->
         <div class="ferre-side-cards">
             <div class="ferre-info-card ferre-slide-up">
                 <div class="ferre-card-icon"><i class="fa-solid fa-clock"></i></div>
@@ -64,7 +54,6 @@ include_once __DIR__ . '/../layouts/header_cliente.php';
         </div>
     </section>
 
-    <!-- SECCIÓN 2: Barra de Estadísticas de Confianza -->
     <section class="ferre-stats-bar ferre-fade-in">
         <div class="ferre-stat-item">
             <i class="fa-solid fa-shield-check"></i>

@@ -1,11 +1,6 @@
-/* =================================================================
-   ESTILOS PREMIUM PARA ADMIN CATEGORÍAS - FERRETERÍA EL CONSTRUCTOR
-   ================================================================ */
-
 :root {
     --primary-color: #0f172a;
     --accent-color: #f59e0b;
-    /* Amarillo ferretero */
     --accent-hover: #d97706;
     --bg-main: #f8fafc;
     --card-bg: #ffffff;
@@ -24,9 +19,7 @@ body {
     margin: 0;
 }
 
-/* =================================================================
-   1. CONTENEDOR Y CABECERA DE LA VISTA
-   ================================================================ */
+/* 1. CONTENEDOR Y CABECERA DE LA VISTA */
 .admin-main-container {
     padding: 2.5rem 1.5rem 4rem 1.5rem;
 }
@@ -55,9 +48,7 @@ body {
     margin: 0;
 }
 
-/* =================================================================
-   2. ALERTAS DEL SISTEMA (ÉXITO / ERROR)
-   ================================================================ */
+/* 2. ALERTAS DEL SISTEMA */
 .alert-success {
     background-color: #f0fdf4;
     border: 1px solid #bbf7d0;
@@ -98,9 +89,7 @@ body {
     font-size: 1.2rem;
 }
 
-/* =================================================================
-   3. GRID DE CONTENIDO (FORMULARIO + TABLA)
-   ================================================================ */
+/* 3. GRID DE CONTENIDO */
 .admin-content-grid {
     display: grid;
     grid-template-columns: 380px 1fr;
@@ -108,9 +97,7 @@ body {
     align-items: start;
 }
 
-/* =================================================================
-   4. TARJETA DE FORMULARIO
-   ================================================================ */
+/* 4. TARJETA DE FORMULARIO */
 .admin-form-card {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
@@ -181,7 +168,6 @@ body {
     margin-top: 0.5rem;
 }
 
-/* Botones de acción */
 .btn-primary {
     background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
     color: var(--primary-color);
@@ -223,9 +209,7 @@ body {
     color: var(--text-main);
 }
 
-/* =================================================================
-   5. TARJETA Y TABLA DE DATOS
-   ================================================================ */
+/* 5. TARJETA Y TABLA DE DATOS */
 .admin-table-card {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
@@ -279,7 +263,6 @@ body {
     padding: 2rem !important;
 }
 
-/* Celda de botones de acción en tabla */
 .actions-cell {
     display: flex;
     gap: 0.5rem;
@@ -320,8 +303,7 @@ body {
     color: #b91c1c;
 }
 
-
-/* Estilos personalizados para el Modal de Confirmación Limpio */
+/* MODAL DE CONFIRMACIÓN */
 .ferre-modal-overlay {
     display: none;
     position: fixed;
@@ -425,9 +407,7 @@ body {
     background: #dc2626;
 }
 
-/* =================================================================
-   6. RESPONSIVIDAD (MÓVILES Y TABLETS)
-   ================================================================ */
+/* 6. RESPONSIVIDAD */
 @media (max-width: 992px) {
     .admin-content-grid {
         grid-template-columns: 1fr;

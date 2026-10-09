@@ -1,7 +1,4 @@
 <?php
-/**
- * Modelo Producto - Ferretería El Constructor
- */
 require_once __DIR__ . '/../config/conexion.php';
 
 class Producto

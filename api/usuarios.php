@@ -30,7 +30,7 @@ switch ($method) {
             // Actualizar usuario existente
             $resultado = $usuarioModel->actualizar($id_usuario, $nombre, $apellido, $correo, $telefono, $direccion, $tipo_usuario);
 
-            // Si se proporciona una contraseña nueva, la actualizamos también
+            // Si se proporciona una contraseña nueva, la actualizamos
             if (!empty($password)) {
                 $usuarioModel->actualizarPassword($id_usuario, $password);
             }

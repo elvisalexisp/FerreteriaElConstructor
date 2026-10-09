@@ -1,7 +1,4 @@
 <?php
-/**
- * Script de Cierre de Sesión Seguro - Ferretería El Constructor
- */
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

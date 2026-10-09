@@ -1,7 +1,4 @@
 <?php
-/**
- * Vista Administración de Usuarios - Ferretería El Constructor
- */
 require_once __DIR__ . '/../../controllers/UsuarioController.php';
 
 // Iniciar sesión si no está iniciada

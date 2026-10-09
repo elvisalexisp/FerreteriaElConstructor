@@ -1,12 +1,8 @@
 <?php
-/**
- * Vista Admin Categorías - Ferretería El Constructor
- */
 require_once __DIR__ . '/../../controllers/CategoriaController.php';
 $categoriaController = new CategoriaController();
 $categorias = $categoriaController->listar();
 
-// Si se solicita editar una categoría específica
 $editando = false;
 $catActual = ['id_categoria' => '', 'nombre' => '', 'descripcion' => ''];
 if (isset($_GET['editar'])) {
@@ -27,7 +23,6 @@ if (isset($_GET['editar'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Categorías - Panel Admin</title>
-    <!-- Hojas de estilos del panel de administración -->
     <link rel="stylesheet" href="<?php echo $directorio_raiz; ?>assets/css/adminCategorias.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -44,7 +39,6 @@ if (isset($_GET['editar'])) {
                 <p>Administra las líneas de productos disponibles en el catálogo de la ferretería</p>
             </div>
 
-            <!-- Alertas del sistema -->
             <?php if (isset($_GET['exito'])): ?>
                 <div class="alert-success">
                     <i class="fa-solid fa-circle-check"></i>
@@ -66,7 +60,6 @@ if (isset($_GET['editar'])) {
             <?php endif; ?>
 
             <div class="admin-content-grid">
-                <!-- Formulario de Creación / Edición -->
                 <div class="admin-form-card">
                     <h3>
                         <?php echo $editando ? 'Editar Categoría' : 'Nueva Categoría'; ?>
@@ -99,7 +92,6 @@ if (isset($_GET['editar'])) {
                     </form>
                 </div>
 
-                <!-- Tabla de Listado -->
                 <div class="admin-table-card">
                     <h3>Categorías Existentes (
                         <?php echo count($categorias); ?>)

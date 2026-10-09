@@ -1,17 +1,13 @@
 <?php
-/**
- * API Carrito - Ferretería El Constructor
- */
 header('Content-Type: application/json; charset=utf-8');
 
-// Iniciar sesión si aún no está iniciada (indispensable para verificar $_SESSION)
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 // Validar si el usuario ha iniciado sesión
 if (!isset($_SESSION['id_usuario'])) {
-    http_response_code(401); // Código HTTP 401 Unauthorized
+    http_response_code(401);
     echo json_encode([
         "status" => "error",
         "error" => "¡Hola! Inicia sesión o crea una cuenta para guardar tus favoritos y comprar tus productos."

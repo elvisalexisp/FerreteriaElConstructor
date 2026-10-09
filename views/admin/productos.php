@@ -1,7 +1,4 @@
 <?php
-/**
- * Vista Admin - Gestión de Productos (Optimizado y Robusto)
- */
 require_once __DIR__ . '/../../controllers/ProductoController.php';
 
 $controller = new ProductoController();

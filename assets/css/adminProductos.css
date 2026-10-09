@@ -1,9 +1,5 @@
-/* =================================================================
-   ESTILOS MODERNOS - GESTIÓN DE PRODUCTOS (ADMIN)
-   ================================================================ */
-
 .admin-container {
-    padding: 1.5rem 2rem;
+    padding: 1.5rem 2.0rem;
     max-width: 1400px;
     margin: 0 auto;
     box-sizing: border-box;
@@ -47,7 +43,7 @@
     border: 1px solid #fecaca;
 }
 
-/* Tarjetas de Contenido (Formulario y Tabla) */
+/* Tarjetas de Contenido */
 .form-card,
 .table-card {
     background-color: #ffffff;
@@ -360,7 +356,6 @@
 
 .btn-eliminar {
     background-color: #ef4444;
-    /* Rojo elegante */
     color: #ffffff;
 }
 
@@ -375,9 +370,7 @@
     margin-bottom: 0.5rem;
 }
 
-/* =================================================================
-   MODAL DE ELIMINACIÓN PERSONALIZADO
-   ================================================================ */
+/* MODAL DE ELIMINACIÓN */
 .custom-modal-overlay {
     position: fixed;
     top: 0;
@@ -480,9 +473,7 @@
     background-color: #b91c1c;
 }
 
-/* =================================================================
-   RESPONSIVO
-   ================================================================ */
+/* RESPONSIVO */
 @media (max-width: 768px) {
 
     .form-grid,

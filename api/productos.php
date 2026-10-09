@@ -1,7 +1,4 @@
 <?php
-/**
- * API Productos - Ferretería El Constructor
- */
 header('Content-Type: application/json');
 require_once __DIR__ . '/../config/conexion.php';
 require_once __DIR__ . '/../controllers/ProductoController.php';

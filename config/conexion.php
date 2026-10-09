@@ -1,17 +1,10 @@
 <?php
 class Conexion
 {
-    /**
-     * LocalHost configuration for database connection
-     * $host = "localhost";
-     * $db = "if0_42657112_elconstructor_db";
-     * $user = "root";
-     * $pass = "";
-     */
     public static function conectar()
     {
         $host = "localhost";
-        $db = "if0_42657112_elconstructor_db";
+        $db = "ferreteria-constructor1";
         $user = "root";
         $pass = "";
 

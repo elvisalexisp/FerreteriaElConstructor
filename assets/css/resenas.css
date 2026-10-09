@@ -1,11 +1,6 @@
-/* =================================================================
-   ESTILOS PREMIUM PARA RESEÑAS - FERRETERÍA EL CONSTRUCTOR
-   ================================================================ */
-
 :root {
     --primary-color: #0f172a;
     --accent-color: #f59e0b;
-    /* Amarillo ferretero */
     --accent-hover: #d97706;
     --bg-main: #f8fafc;
     --card-bg: #ffffff;
@@ -30,9 +25,6 @@ body {
     padding: 2rem 1.5rem 4rem 1.5rem;
 }
 
-/* =================================================================
-   1. SECCIÓN DE TÍTULO
-   ================================================================ */
 .seccion-titulo {
     margin-bottom: 2rem;
     border-bottom: 2px solid var(--border-color);
@@ -52,9 +44,6 @@ body {
     margin: 0;
 }
 
-/* =================================================================
-   2. TARJETA DE FORMULARIO PARA DEJAR RESEÑA
-   ================================================================ */
 .card-formulario {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
@@ -135,7 +124,6 @@ body {
     transform: translateY(-1px);
 }
 
-/* Alerta cuando el usuario no ha iniciado sesión */
 .alerta-login {
     background-color: #fffbeb;
     border: 1px solid #fde68a;
@@ -157,9 +145,6 @@ body {
     text-decoration: underline;
 }
 
-/* =================================================================
-   3. LISTA Y GRILLA DE RESEÑAS
-   ================================================================ */
 .lista-resenas h2 {
     font-size: 1.4rem;
     font-weight: 800;
@@ -243,7 +228,6 @@ body {
     padding: 2rem 0;
 }
 
-/* Estilos idénticos del modal de confirmación de la wishlist */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -332,7 +316,6 @@ body {
     background: #c9302c;
 }
 
-/* Botones de acciones en la tarjeta de reseña */
 .acciones-resena {
     margin-top: 12px;
     display: flex;
@@ -370,10 +353,6 @@ body {
     background-color: #c9302c;
 }
 
-
-/* =================================================================
-   4. RESPONSIVIDAD (MÓVILES)
-   ================================================================ */
 @media (max-width: 768px) {
     .grid-resenas {
         grid-template-columns: 1fr;

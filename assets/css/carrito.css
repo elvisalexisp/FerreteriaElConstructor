@@ -1,11 +1,6 @@
-/* =================================================================
-   ESTILOS PREMIUM PARA CARRITO - FERRETERÍA EL CONSTRUCTOR
-   ================================================================ */
-
 :root {
     --primary-color: #0f172a;
     --accent-color: #f59e0b;
-    /* Amarillo ferretero */
     --accent-hover: #d97706;
     --bg-main: #f8fafc;
     --card-bg: #ffffff;
@@ -24,9 +19,7 @@ body {
     margin: 0;
 }
 
-/* =================================================================
-   1. CONTENEDOR Y CABECERA
-   ================================================================ */
+/* 1. CONTENEDOR Y CABECERA */
 .carrito-container {
     max-width: 1200px;
     margin: 2.5rem auto 4rem auto;
@@ -59,9 +52,7 @@ body {
     margin: 0;
 }
 
-/* =================================================================
-   2. ALERTAS Y ESTADOS VACÍOS / ÉXITO
-   ================================================================ */
+/* 2. ALERTAS Y ESTADOS */
 .alerta-exito {
     background-color: #f0fdf4;
     border: 1px solid #bbf7d0;
@@ -127,9 +118,7 @@ body {
     margin: 0 0 1.5rem 0;
 }
 
-/* =================================================================
-   3. LAYOUT GRID PRINCIPAL (ITEMS + RESUMEN)
-   ================================================================ */
+/* 3. LAYOUT GRID PRINCIPAL */
 .carrito-grid {
     display: grid;
     grid-template-columns: 1fr 380px;
@@ -143,7 +132,6 @@ body {
     gap: 1rem;
 }
 
-/* Tarjeta individual de producto en el carrito */
 .carrito-item-card {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
@@ -236,9 +224,7 @@ body {
     color: #dc2626;
 }
 
-/* =================================================================
-   4. RESUMEN DE COMPRA Y CHECKOUT INTEGRADO
-   ================================================================ */
+/* 4. RESUMEN DE COMPRA Y CHECKOUT */
 .carrito-resumen-card {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
@@ -281,7 +267,6 @@ body {
     margin-bottom: 1.5rem;
 }
 
-/* Formulario de Checkout dentro del Resumen */
 .form-checkout-integrado {
     display: flex;
     flex-direction: column;
@@ -325,7 +310,6 @@ body {
     min-height: 70px;
 }
 
-/* Botones Principales */
 .btn-primary {
     background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
     color: var(--primary-color);
@@ -353,9 +337,7 @@ body {
     box-sizing: border-box;
 }
 
-/* =================================================================
-   5. RESPONSIVIDAD (MÓVILES)
-   ================================================================ */
+/* 5. RESPONSIVIDAD */
 @media (max-width: 900px) {
     .carrito-grid {
         grid-template-columns: 1fr;
@@ -386,7 +368,7 @@ body {
     }
 }
 
-/* --- Estilos para el Modal Personalizado de Eliminación --- */
+/* MODAL DE ELIMINACIÓN */
 .modal-eliminar-overlay {
     position: fixed;
     top: 0;
@@ -416,7 +398,6 @@ body {
 .modal-eliminar-icono {
     font-size: 45px;
     color: #e67e22;
-    /* Tono de advertencia elegante */
     margin-bottom: 15px;
 }
 
@@ -463,7 +444,6 @@ body {
 
 .btn-confirmar-modal {
     background-color: #e74c3c;
-    /* Rojo estilizado para eliminar */
     color: #ffffff;
 }
 
@@ -471,7 +451,6 @@ body {
     background-color: #c0392b;
 }
 
-/* Animaciones suaves para el modal */
 @keyframes fadeInModal {
     from {
         opacity: 0;

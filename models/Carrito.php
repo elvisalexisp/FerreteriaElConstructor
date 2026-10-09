@@ -1,7 +1,4 @@
 <?php
-/**
- * Modelo Carrito - Ferretería El Constructor
- */
 require_once __DIR__ . '/../config/conexion.php';
 require_once __DIR__ . '/Producto.php';
 

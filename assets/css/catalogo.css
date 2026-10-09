@@ -1,7 +1,3 @@
-/* =================================================================
-   ESTILOS COMPACTOS Y PROFESIONALES - FERRETERÍA EL CONSTRUCTOR
-   ================================================================ */
-
 :root {
     --primary-color: #0f172a;
     --primary-light: #1e293b;
@@ -39,9 +35,7 @@ body {
     padding: 1rem 1.5rem 3rem 1.5rem;
 }
 
-/* =================================================================
-   1. LAYOUT PRINCIPAL Y SIDEBAR COMPACTO
-   ================================================================ */
+/* 1. LAYOUT PRINCIPAL Y SIDEBAR COMPACTO */
 .catalogo-layout-principal {
     display: grid;
     grid-template-columns: 240px 1fr;
@@ -160,9 +154,7 @@ body {
     text-decoration: underline;
 }
 
-/* =================================================================
-   2. GRILLA Y TARJETAS SÚPER COMPACTAS
-   ================================================================ */
+/* 2. GRILLA Y TARJETAS SÚPER COMPACTAS */
 .catalogo-grid-container {
     width: 100%;
 }
@@ -226,7 +218,6 @@ body {
 .card-imagen {
     width: 100%;
     height: 120px;
-    /* Reducida para compactar la tarjeta */
     background-color: #f1f5f9;
     display: flex;
     align-items: center;
@@ -359,9 +350,7 @@ body {
     background-color: #e2e8f0;
 }
 
-/* =================================================================
-   3. ESTADO VACÍO Y MODAL COMPACTOS
-   ================================================================ */
+/* 3. ESTADO VACÍO Y MODAL COMPACTOS */
 .estado-vacio {
     text-align: center;
     padding: 3rem 1.5rem;
@@ -546,10 +535,7 @@ body {
     }
 }
 
-/* ==========================================
-   ANIMACIONES Y BOTONES DEL CARRITO
-   ================================---------- */
-
+/* ANIMACIONES Y BOTONES DEL CARRITO */
 @keyframes pulseButton {
     0% {
         transform: scale(1);
@@ -564,14 +550,12 @@ body {
     }
 }
 
-/* Botón estilizado "Ir al pago" */
 .btn-ir-pago {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     background-color: #27ae60;
-    /* Verde profesional de éxito */
     color: #ffffff;
     border: none;
     padding: 10px 16px;
@@ -595,7 +579,6 @@ body {
     transform: scale(0.97);
 }
 
-/* Efecto de vuelo del producto al carrito */
 .flyer-carrito {
     position: fixed;
     z-index: 99999;
@@ -606,19 +589,16 @@ body {
     transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* Carrito flotante lateral derecho (al hacer scroll) */
 #carrito-flotante-derecha {
     position: fixed;
     right: 20px;
     bottom: 30px;
     background-color: #ff8c00;
-    /* Naranja corporativo */
     color: white;
     width: 55px;
     height: 55px;
     border-radius: 50%;
     display: none;
-    /* Se activa dinámicamente con JS */
     align-items: center;
     justify-content: center;
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
@@ -636,7 +616,6 @@ body {
     width: 100%;
     height: 100%;
     position: relative;
-    /* Clave para posicionar la insignia absolute */
 }
 
 #carrito-flotante-derecha:hover {
@@ -645,7 +624,6 @@ body {
     box-shadow: 0 8px 20px rgba(255, 140, 0, 0.4);
 }
 
-/* Animación de pulso para el botón flotante */
 .pulse-flotante {
     animation: pulseAnim 0.6s ease;
 }
@@ -664,13 +642,11 @@ body {
     }
 }
 
-/* Insignia / Badge del número de productos (Ajustada para 1 o varios dígitos) */
 .badge-flotante {
     position: absolute;
     top: -4px;
     right: -4px;
     background-color: #e74c3c;
-    /* Rojo de alerta */
     color: white;
     font-size: 11px;
     font-weight: 700;
@@ -678,17 +654,13 @@ body {
     height: 20px;
     padding: 0 5px;
     border-radius: 10px;
-    /* Forma de píldora adaptable */
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
     border: 2px solid #ffffff;
-    /* Pequeño borde para que destaque sobre el icono */
 }
 
-
-/* Estilo para resaltar un producto específico al venir desde la wishlist */
 .producto-card.highlight,
 .card-producto.highlight,
 [id^="producto-"].highlight {
@@ -714,7 +686,6 @@ body {
     }
 }
 
-/* Estilo visual para resaltar el producto seleccionado desde la wishlist */
 .card-producto.highlight-product {
     border: 3px solid #ff9800 !important;
     box-shadow: 0 0 20px rgba(255, 152, 0, 0.7) !important;
@@ -723,7 +694,6 @@ body {
     transition: all 0.4s ease-in-out;
 }
 
-/* Estilos adicionales para la barra de búsqueda activa */
 .busqueda-activa-banner {
     background: #eef2ff;
     border: 1px solid #c7d2fe;

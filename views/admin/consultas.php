@@ -1,7 +1,4 @@
 <?php
-/**
- * Vista Administración de Pedidos / Consultas - Panel Admin con Modal Nativo Estilizado
- */
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

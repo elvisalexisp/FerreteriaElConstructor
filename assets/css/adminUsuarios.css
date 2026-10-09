@@ -1,11 +1,6 @@
-/* =================================================================
-   ESTILOS PREMIUM PARA ADMIN USUARIOS - FERRETERÍA EL CONSTRUCTOR
-   ================================================================ */
-
 :root {
     --primary-color: #0f172a;
     --accent-color: #f59e0b;
-    /* Amarillo ferretero */
     --accent-hover: #d97706;
     --bg-main: #f8fafc;
     --card-bg: #ffffff;
@@ -20,9 +15,7 @@
     --success-color: #10b981;
 }
 
-/* =================================================================
-   1. CONTENEDOR Y CABECERA DE LA VISTA
-   ================================================================ */
+/* 1. CONTENEDOR Y CABECERA DE LA VISTA */
 .admin-container {
     max-width: 100%;
     margin: 0 auto;
@@ -49,9 +42,7 @@
     margin: 0;
 }
 
-/* =================================================================
-   2. ALERTA DE ÉXITO (MENSAJE DE CAMBIOS GUARDADOS)
-   ================================================================ */
+/* 2. ALERTA DE ÉXITO */
 .alert-success {
     background-color: #ecfdf5;
     border: 1px solid #a7f3d0;
@@ -85,9 +76,7 @@
     }
 }
 
-/* =================================================================
-   3. TARJETA DE FORMULARIO Y CONTENEDORES
-   ================================================================ */
+/* 3. TARJETA DE FORMULARIO Y CONTENEDORES */
 .tabla-admin-wrapper {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
@@ -116,7 +105,6 @@
     color: var(--accent-hover);
 }
 
-/* Grilla adaptable y compacta para los inputs (3 columnas) */
 .form-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -171,7 +159,6 @@
     color: #94a3b8;
 }
 
-/* Acciones del Formulario */
 .form-actions {
     margin-top: 0.2rem;
     display: flex;
@@ -180,7 +167,6 @@
     flex-wrap: wrap;
 }
 
-/* Botón Guardar / Actualizar */
 .btn-primario {
     background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
     color: var(--primary-color);
@@ -202,7 +188,6 @@
     transform: translateY(-1px);
 }
 
-/* Botón Cancelar Edición */
 .btn-secundario {
     background-color: #e2e8f0;
     color: var(--primary-color);
@@ -222,9 +207,7 @@
     background-color: #cbd5e1;
 }
 
-/* =================================================================
-   4. TABLA DE USUARIOS REGISTRADOS
-   ================================================================ */
+/* 4. TABLA DE USUARIOS REGISTRADOS */
 .tabla-admin {
     width: 100%;
     border-collapse: collapse;
@@ -265,9 +248,7 @@
     color: var(--text-muted);
 }
 
-/* =================================================================
-   5. INSIGNIAS DE ROLES (BADGES)
-   ================================================================ */
+/* 5. INSIGNIAS DE ROLES */
 .badge-rol {
     display: inline-block;
     padding: 0.25rem 0.65rem;
@@ -296,9 +277,7 @@
     border: 1px solid #bae6fd;
 }
 
-/* =================================================================
-   6. BOTONES DE ACCIÓN (EDITAR / ELIMINAR EN TABLA)
-   ================================================================ */
+/* 6. BOTONES DE ACCIÓN */
 .actions-cell {
     white-space: nowrap;
     width: 1%;
@@ -352,9 +331,7 @@
     font-style: italic;
 }
 
-/* =================================================================
-   7. MODAL MODERNO DE ELIMINACIÓN (REEMPLAZA ALERTA NATIVA)
-   ================================================================ */
+/* 7. MODAL MODERNO DE ELIMINACIÓN */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -456,9 +433,7 @@
     background-color: var(--danger-hover);
 }
 
-/* =================================================================
-   ESTILOS PARA EL INPUT DE CONTRASEÑA CON BOTÓN DE VISIBILIDAD (OJITO)
-   ================================================================ */
+/* INPUT DE CONTRASEÑA CON BOTÓN DE VISIBILIDAD */
 .password-container {
     position: relative;
     display: flex;
@@ -470,7 +445,6 @@
 .password-container input[type="text"] {
     width: 100%;
     padding-right: 2.8rem;
-    /* Espacio para que el texto no choque con el botón del ojo */
 }
 
 .btn-toggle-password {
@@ -492,9 +466,7 @@
     color: var(--accent-hover);
 }
 
-/* =================================================================
-   8. RESPONSIVIDAD DINÁMICA
-   ================================================================ */
+/* 8. RESPONSIVIDAD DINÁMICA */
 @media (max-width: 1200px) {
     .form-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));

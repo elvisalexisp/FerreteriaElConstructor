@@ -1,7 +1,3 @@
-/**
- * Script Principal - Ferretería El Constructor
- */
-
 document.addEventListener("DOMContentLoaded", () => {
   // 1. Control del botón desplegable de categorías en el header
   const btnCategorias = document.getElementById("btnCategoriasToggle");

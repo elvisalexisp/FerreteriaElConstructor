@@ -1,7 +1,4 @@
 <?php
-/**
- * API Pedidos - Ferretería El Constructor
- */
 header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../models/Pedido.php';
 
